@@ -26,5 +26,14 @@
     <string name="about_text_version">Verzió: %1$s</string>
     <string name="about_text_logo_thanks_text">Az eredeti logo grafikát Alexandre Moore készítette. Köszönet a munkájáért!\nA weboldala:</string>
     <string name="about_text_author">Szerző: %1$s</string>
+    <string name="backup_config_button">Konfiguráció mentése</string>
+    <string name="restore_config_button">Konfiguráció visszatöltése</string>
+    <string name="ext_storage_not_writable">A külső tároló nem írható!</string>
+    <string name="ext_storage_not_readable">A külső tároló nem olvasható!</string>
+    <string name="backup_file_not_be_found">Nem található a mentésfájl a %1$s helyen.</string>
+    <string name="error_while_creating_backup">Hiba a mentés készítésekor: %1$s</string>
+    <string name="error_while_loading_backup">Hiba a mentés betöltésekor: %1$s</string>
+    <string name="backup_file_created">A mentésfájl elkészült itt: %1$s</string>
+    <string name="backup_file_loaded">A mentésfájl betöltésre került!</string>
 
 </resources>

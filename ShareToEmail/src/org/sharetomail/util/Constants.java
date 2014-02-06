@@ -32,4 +32,6 @@ public class Constants {
 	public static final String DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY = "default_email_address";
 	public static final String EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY = "email_subject_prefix";
 	public static final String AUTO_USE_DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY = "auto_use_default_email_address";
+
+	public static final String CONFIGURATION_BACKUP_FILE = "sharetoemail-backup.properties";
 }

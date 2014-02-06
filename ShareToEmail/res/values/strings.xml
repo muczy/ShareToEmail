@@ -26,5 +26,14 @@
     <string name="about_text_version">Version: %1$s</string>
     <string name="about_text_logo_thanks_text">Original logo artwork was created by Alexandre Moore. Thanks for your work!\nHis site:</string>
     <string name="about_text_author">Author: %1$s</string>
+    <string name="backup_config_button">Backup configuration</string>
+    <string name="restore_config_button">Restore configuration</string>
+    <string name="ext_storage_not_writable">External storage is not writeable!</string>
+    <string name="ext_storage_not_readable">External storage is not readable!</string>
+    <string name="backup_file_not_be_found">Could not find backup file in %1$s.</string>
+    <string name="error_while_creating_backup">Error while creating backup: %1$s</string>
+    <string name="error_while_loading_backup">Error while loading backup: %1$s</string>
+    <string name="backup_file_created">Backup file has been created here: %1$s</string>
+    <string name="backup_file_loaded">Backup file has been loaded!</string>
 
 </resources>
