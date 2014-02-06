@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Shared preferences default values -->
+    <string name="default_email_subject_prefix">Megosztott link -&#160;</string>
+    <!-- Dialog strings -->
+    <string name="dialog_input_is_not_in_email_format">A megadott érték nem e-mail formátumú!</string>
+    <string name="send_email">E-mail küldése</string>
+    <!-- Title strings -->
+    <string name="app_name">Share to email</string>
+    <string name="title_activity_add_email_address">E-mail cím hozzáadása</string>
+    <string name="title_activity_modify_email_address">E-mail cím módosítása</string>
+    <string name="title_activity_settings">Beállítások</string>
+    <!-- Other strings -->
+    <string name="action_settings">Beállítások</string>
+        <string name="action_about">Névjegy</string>
+    <string name="add_email_address_button">E-mail cím hozzáadása</string>
+    <string name="modify_email_address_button">E-mail cím módosítása</string>
+    <string name="new_email_address_hint">Új e-mail cím</string>
+    <string name="modify_email_address_menu_item">E-mail cím módosítása</string>
+    <string name="delete_email_address_menu_item">E-mail cím törlése</string>
+    <string name="set_as_default_email_address_menu_item">Beállítás alapértelmezett e-mail címként</string>
+    <string name="unset_as_default_email_address_menu_item">Beállítás nem alapértelmezett e-mail címként</string>
+    <string name="auto_use_default_email_address_setting_text">Automatikusan használja az alapértelmezett e-mail címet</string>
+    <string name="subject_prefix_setting_text">E-mail tárgy előtag:</string>
+    <string name="about_text_version">Verzió: %1$s</string>
+    <string name="about_text_logo_thanks_text">Az eredeti logo grafikát Alexandre Moore készítette. Köszönet a munkájáért!\nA weboldala:</string>
+    <string name="about_text_author">Szerző: %1$s</string>
+
+</resources>

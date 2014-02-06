@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:id="@+id/modifyEmailAddressItem" android:title="@string/modify_email_address_menu_item" />
+    <item android:id="@+id/deleteEmailAddressItem" android:title="@string/delete_email_address_menu_item" />
+    <item android:id="@+id/setAsDefaultEmailAddressItem" android:title="@string/set_as_default_email_address_menu_item" />
+    <item android:id="@+id/unsetAsDefaultEmailAddressItem" android:title="@string/unset_as_default_email_address_menu_item" android:visible="false"/>
+</menu>
