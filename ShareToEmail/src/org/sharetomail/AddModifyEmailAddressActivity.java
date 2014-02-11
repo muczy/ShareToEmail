@@ -98,7 +98,7 @@ public class AddModifyEmailAddressActivity extends Activity {
 							}
 						}
 
-						// TODO: original email address was not found (somebody
+						// Original email address was not found (somebody
 						// removed it in the mean time?) so we add it.
 						if (position < 0) {
 							config.addEmailAddress(inputText);
