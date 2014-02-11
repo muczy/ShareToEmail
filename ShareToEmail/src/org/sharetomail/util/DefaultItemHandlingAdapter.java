@@ -1,18 +1,3 @@
-/*******************************************************************************
- * Copyright 2013 Peter Mihaly Avramucz
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
 package org.sharetomail.util;
 
 import java.util.List;
@@ -24,21 +9,34 @@ import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-public class DefaultItemHandlingArrayAdapter extends ArrayAdapter<String> {
+public class DefaultItemHandlingAdapter<T> extends BaseAdapter {
 
 	private Context context;
-	private List<String> objects;
-	private String defaultItem;
+	private List<T> objects;
+	private T defaultItem;
 
-	public DefaultItemHandlingArrayAdapter(Context context,
-			List<String> objects, String defaultItem) {
-		super(context, android.R.layout.simple_list_item_1, objects);
+	public DefaultItemHandlingAdapter(Context context, List<T> objects, T defaultItem) {
 		this.context = context;
 		this.objects = objects;
 		this.defaultItem = defaultItem;
+	}
+
+	@Override
+	public int getCount() {
+		return objects.size();
+	}
+
+	@Override
+	public Object getItem(int position) {
+		return objects.get(position);
+	}
+
+	@Override
+	public long getItemId(int position) {
+		return position;
 	}
 
 	@Override
@@ -58,13 +56,14 @@ public class DefaultItemHandlingArrayAdapter extends ArrayAdapter<String> {
 		// Make the default item bold.
 		if (defaultItem.equals(objects.get(position))) {
 			SpannableString spannableString = new SpannableString(
-					objects.get(position));
+					String.valueOf(objects.get(position)));
 			spannableString.setSpan(new StyleSpan(Typeface.BOLD), 0,
 					spannableString.length(), 0);
 			defaultItemHandlingTextView.setText(spannableString,
 					TextView.BufferType.SPANNABLE);
 		} else {
-			defaultItemHandlingTextView.setText(objects.get(position));
+			defaultItemHandlingTextView.setText(String.valueOf(objects
+					.get(position)));
 		}
 
 		return rowView;
@@ -76,8 +75,18 @@ public class DefaultItemHandlingArrayAdapter extends ArrayAdapter<String> {
 	 * @param defaultItem
 	 *            the new default item
 	 */
-	public void setDefaultItem(String defaultItem) {
+	public void setDefaultItem(T defaultItem) {
 		this.defaultItem = defaultItem;
+		notifyDataSetChanged();
+	}
+
+	public void clear() {
+		objects.clear();
+		notifyDataSetChanged();
+	}
+
+	public void addAll(List<T> objectList) {
+		objects.addAll(objectList);
 		notifyDataSetChanged();
 	}
 

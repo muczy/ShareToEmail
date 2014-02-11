@@ -16,6 +16,7 @@
 package org.sharetomail.util;
 
 public class Constants {
+	public static final String SHARED_PREFERENCES_NAME = "ShareToEmail_SHARED_PREFERENCES_NAME";
 	public static final String SPLIT_REGEXP = ",";
 	public static final String MAILTO_SCHEME = "mailto";
 

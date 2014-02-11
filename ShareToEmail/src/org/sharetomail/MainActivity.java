@@ -15,20 +15,16 @@
  ******************************************************************************/
 package org.sharetomail;
 
-import java.util.LinkedList;
-import java.util.List;
-
+import org.sharetomail.util.Configuration;
 import org.sharetomail.util.Constants;
-import org.sharetomail.util.DefaultItemHandlingArrayAdapter;
-
+import org.sharetomail.util.DefaultItemHandlingAdapter;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.util.Linkify;
@@ -53,17 +49,10 @@ public class MainActivity extends Activity {
 	private static final String TAG = MainActivity.class.getName();
 
 	private ListView emailAddressesListView;
-	private DefaultItemHandlingArrayAdapter emailAddressesAdapter;
+	private DefaultItemHandlingAdapter<String> emailAddressesAdapter;
 
-	private SharedPreferences sharedPreferences;
-
-	// Since Shared Preferences can't store a list or array (only a set) we
-	// store the email addresses as one long string separated by
-	// Constants.SPLIT_REGEXP character.
-	private List<String> emailAddresses;
-	private String defaultEmailAddress;
-	private String emailSubjectPrefix;
-	private boolean autoUseDefaultEmailAddress;
+	private Configuration config;
+	private static Resources mResources;
 
 	private String selectedItem = "";
 
@@ -72,11 +61,30 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		sharedPreferences = this.getPreferences(Context.MODE_PRIVATE);
+		getPreferences(MODE_PRIVATE);
 
-		loadPreferences();
+		config = new Configuration(getSharedPreferences(
+				Constants.SHARED_PREFERENCES_NAME, MODE_PRIVATE));
+
+		mResources = getResources();
+
+		// If we have a default email address and the auto use option is set
+		// then don't even prompt the user.
+		if (!config.getDefaultEmailAddress().isEmpty()
+				&& getIntent().hasExtra(Intent.EXTRA_TEXT)
+				&& config.isAutoUseDefaultEmailAddress()) {
+			sendEmail(config.getDefaultEmailAddress());
+		}
+
 		initWidgets();
-		refreshEmailList();
+
+		emailAddressesAdapter = new DefaultItemHandlingAdapter<String>(this,
+				config.getEmailAddresses(), config.getDefaultEmailAddress());
+		emailAddressesListView.setAdapter(emailAddressesAdapter);
+	}
+
+	public static Resources getResourcesObject() {
+		return mResources;
 	}
 
 	private void initWidgets() {
@@ -124,75 +132,6 @@ public class MainActivity extends Activity {
 		});
 	}
 
-	private void loadPreferences() {
-		defaultEmailAddress = sharedPreferences.getString(
-				Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY, "");
-		emailSubjectPrefix = sharedPreferences.getString(
-				Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY,
-				getString(R.string.default_email_subject_prefix));
-		autoUseDefaultEmailAddress = sharedPreferences
-				.getBoolean(
-						Constants.AUTO_USE_DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
-						true);
-
-		// If we have a default email address and the auto use option is set
-		// then don't even prompt the user.
-		if (!defaultEmailAddress.isEmpty()
-				&& getIntent().hasExtra(Intent.EXTRA_TEXT)
-				&& autoUseDefaultEmailAddress) {
-			sendEmail(defaultEmailAddress);
-		}
-	}
-
-	private void refreshEmailList() {
-		emailAddresses = new LinkedList<String>();
-		String[] rawEmailAddresses = sharedPreferences.getString(
-				Constants.EMAIL_ADDRESSES_SHARED_PREFERENCES_KEY, "").split(
-				Constants.SPLIT_REGEXP);
-
-		for (int i = 0; i < rawEmailAddresses.length; i++) {
-			if (!rawEmailAddresses[i].isEmpty()) {
-				emailAddresses.add(rawEmailAddresses[i]);
-			}
-		}
-
-		emailAddressesAdapter = new DefaultItemHandlingArrayAdapter(this,
-				emailAddresses, defaultEmailAddress);
-		emailAddressesListView.setAdapter(emailAddressesAdapter);
-	}
-
-	@Override
-	protected void onResume() {
-		refreshEmailList();
-		super.onResume();
-	}
-
-	private void storeSharedPreferences() {
-		StringBuilder builder = new StringBuilder();
-
-		for (int i = 0; i < emailAddresses.size(); i++) {
-			builder.append(emailAddresses.get(i));
-			if (i != emailAddresses.size() - 1) {
-				builder.append(Constants.SPLIT_REGEXP);
-			}
-		}
-
-		SharedPreferences.Editor editor = sharedPreferences.edit();
-
-		editor.putString(Constants.EMAIL_ADDRESSES_SHARED_PREFERENCES_KEY,
-				builder.toString())
-				.putString(
-						Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
-						defaultEmailAddress)
-				.putString(
-						Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY,
-						emailSubjectPrefix)
-				.putBoolean(
-						Constants.AUTO_USE_DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
-						autoUseDefaultEmailAddress).commit();
-
-	}
-
 	private void sendEmail(String emailAddress) {
 		Intent sendMailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
 				Constants.MAILTO_SCHEME, emailAddress, null));
@@ -201,8 +140,8 @@ public class MainActivity extends Activity {
 
 		String subjectFromIntent = getSubject(textFromIntent);
 
-		sendMailIntent.putExtra(Intent.EXTRA_SUBJECT, emailSubjectPrefix
-				+ subjectFromIntent);
+		sendMailIntent.putExtra(Intent.EXTRA_SUBJECT,
+				config.getEmailSubjectPrefix() + subjectFromIntent);
 		sendMailIntent.putExtra(Intent.EXTRA_TEXT, textFromIntent);
 
 		startActivity(Intent.createChooser(sendMailIntent,
@@ -248,9 +187,11 @@ public class MainActivity extends Activity {
 			// Change the context menu item "Set as default" to
 			// "Unset as default" for the default selected list item.
 			if (((TextView) info.targetView).getText().toString()
-					.equals(defaultEmailAddress)) {
-				menu.findItem(R.id.setAsDefaultEmailAddressItem).setTitle(
-						R.string.unset_as_default_email_address_menu_item);
+					.equals(config.getDefaultEmailAddress())) {
+				menu.findItem(R.id.setAsDefaultEmailAddressItem).setVisible(
+						false);
+				menu.findItem(R.id.unsetAsDefaultEmailAddressItem).setVisible(
+						true);
 			}
 		}
 	}
@@ -259,34 +200,29 @@ public class MainActivity extends Activity {
 	public boolean onContextItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.setAsDefaultEmailAddressItem:
-			defaultEmailAddress = selectedItem;
-			emailAddressesAdapter.setDefaultItem(defaultEmailAddress);
-			storeSharedPreferences();
+			config.setDefaultEmailAddress(selectedItem);
+			emailAddressesAdapter.setDefaultItem(selectedItem);
 			return true;
 		case R.id.unsetAsDefaultEmailAddressItem:
-			defaultEmailAddress = "";
-			emailAddressesAdapter.setDefaultItem(defaultEmailAddress);
-			storeSharedPreferences();
+			config.setDefaultEmailAddress("");
+			emailAddressesAdapter.setDefaultItem("");
 			return true;
 		case R.id.modifyEmailAddressItem:
 			Intent modifyEmailAddressIntent = new Intent(this,
 					AddModifyEmailAddressActivity.class);
-			modifyEmailAddressIntent.putExtra(
-					Constants.NEW_EMAIL_ADDRESS_INTENT_KEY, selectedItem);
 			modifyEmailAddressIntent.putExtra(
 					Constants.ORIG_EMAIL_ADDRESS_INTENT_KEY, selectedItem);
 			startActivityForResult(modifyEmailAddressIntent,
 					Constants.MODIFY_EMAIL_ADDRESS_ACTIVITY_REQUEST_CODE);
 			return true;
 		case R.id.deleteEmailAddressItem:
-			emailAddresses.remove(selectedItem);
+			config.removeEmailAddress(selectedItem);
 
-			if (defaultEmailAddress.equals(selectedItem)) {
-				defaultEmailAddress = "";
+			if (config.getDefaultEmailAddress().equals(selectedItem)) {
+				config.setDefaultEmailAddress("");
 			}
 
-			emailAddressesAdapter.notifyDataSetChanged();
-			storeSharedPreferences();
+			refreshEmailList();
 			return true;
 		default:
 			return super.onContextItemSelected(item);
@@ -299,11 +235,6 @@ public class MainActivity extends Activity {
 		switch (item.getItemId()) {
 		case R.id.action_settings:
 			Intent settingsIntent = new Intent(this, SettingsActivity.class);
-			settingsIntent.putExtra(
-					Constants.AUTO_USE_DEFAULT_EMAIL_ADDRESS_INTENT_KEY,
-					autoUseDefaultEmailAddress);
-			settingsIntent.putExtra(Constants.EMAIL_SUBJECT_INTENT_KEY,
-					emailSubjectPrefix);
 			startActivityForResult(settingsIntent,
 					Constants.SETTINGS_ACTIVITY_REQUEST_CODE);
 			return true;
@@ -362,54 +293,22 @@ public class MainActivity extends Activity {
 	}
 
 	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (resultCode == RESULT_OK) {
-			switch (requestCode) {
-			case Constants.ADD_EMAIL_ADDRESS_ACTIVITY_REQUEST_CODE:
-				emailAddresses
-						.add(data
-								.getStringExtra(Constants.NEW_EMAIL_ADDRESS_INTENT_KEY));
-				break;
-
-			case Constants.MODIFY_EMAIL_ADDRESS_ACTIVITY_REQUEST_CODE:
-				int position = -1;
-				for (int i = 0; i < emailAddresses.size(); i++) {
-					if (emailAddresses
-							.get(i)
-							.equals(data
-									.getStringExtra(Constants.ORIG_EMAIL_ADDRESS_INTENT_KEY))) {
-						position = i;
-						break;
-					}
-				}
-
-				emailAddresses
-						.set(position,
-								data.getStringExtra(Constants.NEW_EMAIL_ADDRESS_INTENT_KEY));
-				break;
-
-			case Constants.SETTINGS_ACTIVITY_REQUEST_CODE:
-				autoUseDefaultEmailAddress = data.getBooleanExtra(
-						Constants.AUTO_USE_DEFAULT_EMAIL_ADDRESS_INTENT_KEY,
-						true);
-				emailSubjectPrefix = data
-						.getStringExtra(Constants.EMAIL_SUBJECT_INTENT_KEY);
-				storeSharedPreferences();
-				break;
-			default:
-				break;
-			}
-
-			storeSharedPreferences();
-			refreshEmailList();
-		}
-	}
-
-	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		refreshEmailList();
+		super.onActivityResult(requestCode, resultCode, data);
+	}
+
+	private void refreshEmailList() {
+		emailAddressesAdapter.clear();
+		emailAddressesAdapter.addAll(config.getEmailAddresses());
+		emailAddressesAdapter.setDefaultItem(config.getDefaultEmailAddress());
 	}
 
 }

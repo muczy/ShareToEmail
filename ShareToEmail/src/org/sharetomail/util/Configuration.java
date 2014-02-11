@@ -4,58 +4,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
+import org.sharetomail.MainActivity;
 import org.sharetomail.R;
 
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 
 public class Configuration {
 
-	private List<String> emailAddresses;
-	private String defaultEmailAddress;
-	private String emailSubjectPrefix;
-	private boolean autoUseDefaultEmailAddress;
+	private SharedPreferences sharedPreferences;
 
-	SharedPreferences sharedPreferences;
-
-	public Configuration(SharedPreferences sharedPreferences,
-			Resources resources) {
+	public Configuration(SharedPreferences sharedPreferences) {
 		this.sharedPreferences = sharedPreferences;
-
-		emailAddresses = parseEmailAddresses(sharedPreferences.getString(
-				Constants.EMAIL_ADDRESSES_SHARED_PREFERENCES_KEY, ""));
-
-		defaultEmailAddress = sharedPreferences.getString(
-				Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY, "");
-
-		emailSubjectPrefix = sharedPreferences.getString(
-				Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY,
-				resources.getString(R.string.default_email_subject_prefix));
-
-		autoUseDefaultEmailAddress = sharedPreferences
-				.getBoolean(
-						Constants.AUTO_USE_DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
-						true);
-	}
-
-	public Configuration(SharedPreferences sharedPreferences,
-			Properties properties) {
-		this.sharedPreferences = sharedPreferences;
-
-		emailAddresses = parseEmailAddresses(properties.getProperty(
-				Constants.EMAIL_ADDRESSES_SHARED_PREFERENCES_KEY, ""));
-
-		defaultEmailAddress = properties.getProperty(
-				Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY, "");
-
-		emailSubjectPrefix = properties.getProperty(
-				Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY, "");
-
-		autoUseDefaultEmailAddress = Boolean
-				.parseBoolean(properties
-						.getProperty(
-								Constants.AUTO_USE_DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
-								Constants.AUTO_USE_DEFAULT_EMAIL_ADDRESS_DEFAULT_VALUE));
 	}
 
 	private List<String> parseEmailAddresses(String rawEmailAddressesString) {
@@ -66,50 +25,14 @@ public class Configuration {
 
 		for (int i = 0; i < rawEmailAddresses.length; i++) {
 			if (!rawEmailAddresses[i].isEmpty()) {
-				emailAddresses.add(rawEmailAddresses[i]);
+				result.add(rawEmailAddresses[i]);
 			}
 		}
 
 		return result;
 	}
 
-	public List<String> getEmailAddresses() {
-		return emailAddresses;
-	}
-
-	public void setEmailAddresses(List<String> emailAddresses) {
-		this.emailAddresses = emailAddresses;
-		storeSharedPreferences();
-	}
-
-	public String getDefaultEmailAddress() {
-		return defaultEmailAddress;
-	}
-
-	public void setDefaultEmailAddress(String defaultEmailAddress) {
-		this.defaultEmailAddress = defaultEmailAddress;
-		storeSharedPreferences();
-	}
-
-	public String getEmailSubjectPrefix() {
-		return emailSubjectPrefix;
-	}
-
-	public void setEmailSubjectPrefix(String emailSubjectPrefix) {
-		this.emailSubjectPrefix = emailSubjectPrefix;
-		storeSharedPreferences();
-	}
-
-	public boolean isAutoUseDefaultEmailAddress() {
-		return autoUseDefaultEmailAddress;
-	}
-
-	public void setAutoUseDefaultEmailAddress(boolean autoUseDefaultEmailAddress) {
-		this.autoUseDefaultEmailAddress = autoUseDefaultEmailAddress;
-		storeSharedPreferences();
-	}
-
-	private void storeSharedPreferences() {
+	private void storeEmailAddresses(List<String> emailAddresses) {
 		StringBuilder builder = new StringBuilder();
 
 		for (int i = 0; i < emailAddresses.size(); i++) {
@@ -122,22 +45,89 @@ public class Configuration {
 		SharedPreferences.Editor editor = sharedPreferences.edit();
 
 		editor.putString(Constants.EMAIL_ADDRESSES_SHARED_PREFERENCES_KEY,
-				builder.toString())
-				.putString(
-						Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
-						defaultEmailAddress)
-				.putString(
-						Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY,
-						emailSubjectPrefix)
-				.putBoolean(
+				builder.toString());
+
+		editor.commit();
+	}
+
+	public List<String> getEmailAddresses() {
+		return parseEmailAddresses(sharedPreferences.getString(
+				Constants.EMAIL_ADDRESSES_SHARED_PREFERENCES_KEY, ""));
+	}
+
+	public void addEmailAddress(String item) {
+		List<String> emailAddresses = getEmailAddresses();
+		emailAddresses.add(item);
+		storeEmailAddresses(emailAddresses);
+	}
+
+	public void setEmailAddress(int location, String item) {
+		List<String> emailAddresses = getEmailAddresses();
+		emailAddresses.set(location, item);
+		storeEmailAddresses(emailAddresses);
+	}
+
+	public void removeEmailAddress(String item) {
+		List<String> emailAddresses = getEmailAddresses();
+		emailAddresses.remove(item);
+		storeEmailAddresses(emailAddresses);
+	}
+
+	public String getDefaultEmailAddress() {
+		return sharedPreferences.getString(
+				Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY, "");
+	}
+
+	public void setDefaultEmailAddress(String defaultEmailAddress) {
+		SharedPreferences.Editor editor = sharedPreferences.edit();
+
+		editor.putString(
+				Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
+				defaultEmailAddress);
+
+		editor.commit();
+	}
+
+	public String getEmailSubjectPrefix() {
+		String defaultValue = MainActivity.getResourcesObject().getString(
+				R.string.default_email_subject_prefix);
+		return sharedPreferences.getString(
+				Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY,
+				defaultValue);
+	}
+
+	public void setEmailSubjectPrefix(String emailSubjectPrefix) {
+		SharedPreferences.Editor editor = sharedPreferences.edit();
+
+		editor.putString(Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY,
+				emailSubjectPrefix);
+
+		editor.commit();
+	}
+
+	public boolean isAutoUseDefaultEmailAddress() {
+		return sharedPreferences
+				.getBoolean(
 						Constants.AUTO_USE_DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
-						autoUseDefaultEmailAddress).commit();
+						true);
+	}
+
+	public void setAutoUseDefaultEmailAddress(boolean autoUseDefaultEmailAddress) {
+		SharedPreferences.Editor editor = sharedPreferences.edit();
+
+		editor.putBoolean(
+				Constants.AUTO_USE_DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
+				autoUseDefaultEmailAddress);
+
+		editor.commit();
 	}
 
 	public Properties toProperties() {
 		Properties properties = new Properties();
 
 		StringBuilder builder = new StringBuilder();
+
+		List<String> emailAddresses = getEmailAddresses();
 
 		for (int i = 0; i < emailAddresses.size(); i++) {
 			builder.append(emailAddresses.get(i));
@@ -149,13 +139,35 @@ public class Configuration {
 		properties.put(Constants.EMAIL_ADDRESSES_SHARED_PREFERENCES_KEY,
 				builder.toString());
 		properties.put(Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
-				defaultEmailAddress);
+				getDefaultEmailAddress());
 		properties.put(Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY,
-				emailSubjectPrefix);
+				getEmailSubjectPrefix());
 		properties
 				.put(Constants.AUTO_USE_DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
-						String.valueOf(autoUseDefaultEmailAddress));
+						String.valueOf(isAutoUseDefaultEmailAddress()));
 
 		return properties;
+	}
+
+	public void loadProperties(Properties properties) {
+		SharedPreferences.Editor editor = sharedPreferences.edit();
+
+		editor.putString(Constants.EMAIL_ADDRESSES_SHARED_PREFERENCES_KEY,
+				properties.getProperty(
+						Constants.EMAIL_ADDRESSES_SHARED_PREFERENCES_KEY, ""));
+
+		editor.commit();
+
+		setDefaultEmailAddress(properties.getProperty(
+				Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY, ""));
+
+		setEmailSubjectPrefix(properties.getProperty(
+				Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY, ""));
+
+		setAutoUseDefaultEmailAddress(Boolean
+				.parseBoolean(properties
+						.getProperty(
+								Constants.AUTO_USE_DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
+								Constants.AUTO_USE_DEFAULT_EMAIL_ADDRESS_DEFAULT_VALUE)));
 	}
 }

@@ -15,6 +15,7 @@
  ******************************************************************************/
 package org.sharetomail;
 
+import org.sharetomail.util.Configuration;
 import org.sharetomail.util.Constants;
 
 import android.annotation.TargetApi;
@@ -35,12 +36,18 @@ import android.widget.Toast;
 
 public class AddModifyEmailAddressActivity extends Activity {
 
+	private Configuration config;
+	private String origEmail = null;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_add_email_address);
 		// Show the Up button in the action bar.
 		setupActionBar();
+
+		config = new Configuration(getSharedPreferences(
+				Constants.SHARED_PREFERENCES_NAME, MODE_PRIVATE));
 
 		final Button addModifyEmailAddressButton = (Button) findViewById(R.id.addModifyEmailAddressButton);
 		final TextView emailAddressTextView = (TextView) findViewById(R.id.emailAddressTextView);
@@ -77,11 +84,31 @@ public class AddModifyEmailAddressActivity extends Activity {
 				// NOTE: The default Android Patterns.EMAIL_ADDRESS does not
 				// seems to be handling user@host (host without TLD) so we try
 				// to workaround this here by appending a ".com" string.
-				String inputText = emailAddressTextView.getText().toString();
+				String inputText = emailAddressTextView.getText().toString()
+						.trim();
 				if (isInEmailFormat(inputText)
 						|| isInEmailFormat(inputText + ".com")) {
-					getIntent().putExtra(
-							Constants.NEW_EMAIL_ADDRESS_INTENT_KEY, inputText);
+					if (origEmail != null) {
+						int position = -1;
+						for (int i = 0; i < config.getEmailAddresses().size(); i++) {
+							if (origEmail.equals(config.getEmailAddresses()
+									.get(i))) {
+								position = i;
+								break;
+							}
+						}
+
+						// TODO: original email address was not found (somebody
+						// removed it in the mean time?) so we add it.
+						if (position < 0) {
+							config.addEmailAddress(inputText);
+						}
+
+						config.setEmailAddress(position, inputText);
+					} else {
+						config.addEmailAddress(inputText);
+					}
+
 					setResult(Activity.RESULT_OK, getIntent());
 					finish();
 				} else {
@@ -99,12 +126,13 @@ public class AddModifyEmailAddressActivity extends Activity {
 
 		// If we get the email address in the intent then we modify it so fill
 		// the TextView and rename labels.
-		if (getIntent().hasExtra(Constants.NEW_EMAIL_ADDRESS_INTENT_KEY)) {
+		if (getIntent().hasExtra(Constants.ORIG_EMAIL_ADDRESS_INTENT_KEY)) {
 			setTitle(R.string.title_activity_modify_email_address);
 			addModifyEmailAddressButton
 					.setText(R.string.modify_email_address_button);
-			emailAddressTextView.setText(getIntent().getStringExtra(
-					Constants.NEW_EMAIL_ADDRESS_INTENT_KEY));
+			origEmail = getIntent().getStringExtra(
+					Constants.ORIG_EMAIL_ADDRESS_INTENT_KEY);
+			emailAddressTextView.setText(origEmail);
 		}
 	}
 

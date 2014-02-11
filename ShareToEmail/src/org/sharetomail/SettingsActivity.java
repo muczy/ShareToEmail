@@ -15,22 +15,15 @@
  ******************************************************************************/
 package org.sharetomail;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Properties;
-
+import org.sharetomail.util.Configuration;
 import org.sharetomail.util.Constants;
+import org.sharetomail.util.backup.BackupException;
+import org.sharetomail.util.backup.ConfigurationBackupAgent;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,6 +35,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class SettingsActivity extends Activity implements OnClickListener {
+
+	private Configuration config;
 
 	private CheckBox autoUseDefaultEmailAddressCheckBox;
 	private EditText emailSubjectPrefixEditText;
@@ -55,46 +50,40 @@ public class SettingsActivity extends Activity implements OnClickListener {
 		// Show the Up button in the action bar.
 		setupActionBar();
 
-		// Get the email subject prefix from the intent and set it to default if
-		// it's not set.
-		String emailSubjectPrefix = getIntent().getStringExtra(
-				Constants.EMAIL_SUBJECT_INTENT_KEY);
-		if (emailSubjectPrefix == null) {
-			emailSubjectPrefix = getString(R.string.default_email_subject_prefix);
-		}
+		config = new Configuration(getSharedPreferences(
+				Constants.SHARED_PREFERENCES_NAME, MODE_PRIVATE));
 
+		initWidgets();
+	}
+
+	private void initWidgets() {
 		autoUseDefaultEmailAddressCheckBox = (CheckBox) findViewById(R.id.autoUseDefaultEmailAddressCheckBox);
 		emailSubjectPrefixEditText = (EditText) findViewById(R.id.emailSubjectPrefixEditText);
 		backupConfigButton = (Button) findViewById(R.id.backupConfigButton);
 		restoreConfigButton = (Button) findViewById(R.id.restoreConfigButton);
 
-		// Set the Auto use default email address checkbox checked if the value
-		// is true.
-		if (getIntent().getBooleanExtra(
-				Constants.AUTO_USE_DEFAULT_EMAIL_ADDRESS_INTENT_KEY, true)) {
-			autoUseDefaultEmailAddressCheckBox.setChecked(true);
-		}
-
-		emailSubjectPrefixEditText.setText(emailSubjectPrefix);
+		initWidgetValues();
 
 		backupConfigButton.setOnClickListener(this);
 		restoreConfigButton.setOnClickListener(this);
 	}
 
+	private void initWidgetValues() {
+		if (config.isAutoUseDefaultEmailAddress()) {
+			autoUseDefaultEmailAddressCheckBox.setChecked(true);
+		}
+
+		emailSubjectPrefixEditText.setText(config.getEmailSubjectPrefix());
+	}
+
 	@Override
 	public void onBackPressed() {
 		// Get values from UI controls, put them into the intent and return.
+		config.setAutoUseDefaultEmailAddress(autoUseDefaultEmailAddressCheckBox
+				.isChecked());
 
-		if (autoUseDefaultEmailAddressCheckBox.isChecked()) {
-			getIntent().putExtra(
-					Constants.AUTO_USE_DEFAULT_EMAIL_ADDRESS_INTENT_KEY, true);
-		} else {
-			getIntent().putExtra(
-					Constants.AUTO_USE_DEFAULT_EMAIL_ADDRESS_INTENT_KEY, false);
-		}
-
-		getIntent().putExtra(Constants.EMAIL_SUBJECT_INTENT_KEY,
-				emailSubjectPrefixEditText.getText().toString());
+		config.setEmailSubjectPrefix(emailSubjectPrefixEditText.getText()
+				.toString());
 
 		setResult(Activity.RESULT_OK, getIntent());
 		finish();
@@ -136,138 +125,27 @@ public class SettingsActivity extends Activity implements OnClickListener {
 
 	@Override
 	public void onClick(View v) {
-		if (v == backupConfigButton) {
-			backupConfiguration();
-		} else if (v == restoreConfigButton) {
-			restoreConfiguration();
-		}
-	}
-
-	private void backupConfiguration() {
-		if (!isExternalStorageWriteable()) {
-			Toast.makeText(this, R.string.ext_storage_not_writable,
-					Toast.LENGTH_LONG).show();
-			return;
-		}
-
-		File backupFile = getBackupFile();
-
-		Properties props = new Properties();
-
-		SharedPreferences sharedPreferences = getPreferences(Context.MODE_PRIVATE);
-
-		props.put(Constants.EMAIL_ADDRESSES_SHARED_PREFERENCES_KEY,
-				sharedPreferences.getString(
-						Constants.EMAIL_ADDRESSES_SHARED_PREFERENCES_KEY, ""));
-		props.put(Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
-				sharedPreferences.getString(
-						Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
-						""));
-		props.put(Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY,
-				sharedPreferences.getString(
-						Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY,
-						""));
-		props.put(
-				Constants.AUTO_USE_DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
-				String.valueOf(sharedPreferences
-						.getBoolean(
-								Constants.AUTO_USE_DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
-								true)));
-
 		try {
-			props.store(new FileWriter(backupFile), "Backup creation date:");
-		} catch (IOException e) {
-			Toast.makeText(
-					this,
-					getString(R.string.error_while_loading_backup,
-							e.getMessage()), Toast.LENGTH_LONG).show();
-			return;
-		}
-
-		Toast.makeText(
-				this,
-				getString(R.string.backup_file_created,
-						backupFile.getAbsolutePath()), Toast.LENGTH_LONG)
-				.show();
-	}
-
-	private void restoreConfiguration() {
-		if (!isExternalStorageWriteable() && !isExternalStorageReadable()) {
-			Toast.makeText(this, R.string.ext_storage_not_readable,
+			if (v == backupConfigButton) {
+				ConfigurationBackupAgent.onBackup(config);
+				Toast.makeText(
+						this,
+						getString(R.string.backup_file_created,
+								ConfigurationBackupAgent.getBackupFileName()),
+						Toast.LENGTH_LONG).show();
+			} else if (v == restoreConfigButton) {
+				ConfigurationBackupAgent.onRestore(config);
+				Toast.makeText(
+						this,
+						getString(R.string.backup_file_loaded,
+								ConfigurationBackupAgent.getBackupFileName()),
+						Toast.LENGTH_LONG).show();
+				initWidgetValues();
+			}
+		} catch (BackupException e) {
+			Toast.makeText(this, e.getFormattedMessage(getResources()),
 					Toast.LENGTH_LONG).show();
-			return;
 		}
-
-		File backupFile = getBackupFile();
-
-		Properties props = new Properties();
-		try {
-			props.load(new FileReader(backupFile));
-		} catch (FileNotFoundException e) {
-			Toast.makeText(
-					this,
-					getString(R.string.backup_file_not_be_found,
-							backupFile.getParent()), Toast.LENGTH_LONG).show();
-			return;
-		} catch (IOException e) {
-			Toast.makeText(
-					this,
-					getString(R.string.error_while_loading_backup,
-							e.getMessage()), Toast.LENGTH_LONG).show();
-			return;
-		}
-
-		SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE)
-				.edit();
-
-		editor.putString(Constants.EMAIL_ADDRESSES_SHARED_PREFERENCES_KEY,
-				props.getProperty(
-						Constants.EMAIL_ADDRESSES_SHARED_PREFERENCES_KEY, ""));
-		editor.putString(
-				Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
-				props.getProperty(
-						Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
-						""));
-		editor.putString(Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY,
-				props.getProperty(
-						Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY,
-						""));
-		editor.putBoolean(
-				Constants.AUTO_USE_DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
-				Boolean.valueOf(props
-						.getProperty(
-								Constants.AUTO_USE_DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
-								"true")));
-
-		editor.commit();
-
-		Toast.makeText(
-				this,
-				getString(R.string.backup_file_loaded,
-						backupFile.getAbsolutePath()), Toast.LENGTH_LONG)
-				.show();
 	}
 
-	public boolean isExternalStorageReadable() {
-		String state = Environment.getExternalStorageState();
-		if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-			return true;
-		}
-		return false;
-	}
-
-	public boolean isExternalStorageWriteable() {
-		String state = Environment.getExternalStorageState();
-		if (Environment.MEDIA_MOUNTED.equals(state)) {
-			return true;
-		}
-		return false;
-	}
-
-	private File getBackupFile() {
-		return new File(
-				Environment
-						.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-				Constants.CONFIGURATION_BACKUP_FILE);
-	}
 }
