@@ -240,7 +240,18 @@ public class MainActivityTest extends
 				Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY, "N/A"));
 	}
 
+	public void testOpenAbout() {
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText(solo.getCurrentActivity().getString(
+				org.sharetomail.R.string.action_about));
+		assertTrue(solo.waitForDialogToOpen());
+	}
+
 	public void testOpenSettings() {
+		openSettings();
+	}
+
+	private void openSettings() {
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText(solo.getCurrentActivity().getString(
 				org.sharetomail.R.string.action_settings));
@@ -248,11 +259,28 @@ public class MainActivityTest extends
 				+ SettingsActivity.class.getName(), SettingsActivity.class);
 	}
 
-	public void testOpenAbout() {
-		solo.sendKey(Solo.MENU);
-		solo.clickOnText(solo.getCurrentActivity().getString(
-				org.sharetomail.R.string.action_about));
-		assertTrue(solo.waitForDialogToOpen());
+	public void testSettings_AutoUseDefaultEmailAddress() {
+		openSettings();
+
+		solo.clickOnCheckBox(0);
+
+		solo.goBack();
+
+		assertFalse(sharedPreferences
+				.getBoolean(
+						Constants.AUTO_USE_DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
+						true));
+
+		openSettings();
+
+		solo.clickOnCheckBox(0);
+
+		solo.goBack();
+
+		assertTrue(sharedPreferences
+				.getBoolean(
+						Constants.AUTO_USE_DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
+						false));
 	}
 
 	@Override
