@@ -3,15 +3,23 @@
  */
 package org.sharetomail.test;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Properties;
+
 import org.sharetomail.AddModifyEmailAddressActivity;
 import org.sharetomail.MainActivity;
 import org.sharetomail.SettingsActivity;
+import org.sharetomail.util.Configuration;
 import org.sharetomail.util.Constants;
 
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.Environment;
 import android.test.ActivityInstrumentationTestCase2;
 import android.widget.EditText;
 import android.widget.ListAdapter;
@@ -297,6 +305,33 @@ public class MainActivityTest extends
 
 		assertEquals(testsubjectPrefix, sharedPreferences.getString(
 				Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY, ""));
+	}
+
+	public void testSettings_Backup() {
+		openSettings();
+
+		solo.clickOnButton(solo.getCurrentActivity().getString(
+				org.sharetomail.R.string.backup_config_button));
+
+		File backupFile = new File(
+				Environment
+						.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+				Constants.CONFIGURATION_BACKUP_FILE);
+		assertTrue(backupFile.canRead());
+
+		Properties props = new Properties();
+		try {
+			props.load(new FileReader(backupFile));
+		} catch (FileNotFoundException e) {
+			fail(e.getMessage());
+		} catch (IOException e) {
+			fail(e.getMessage());
+		}
+
+		Properties propsFromConfig = new Configuration(sharedPreferences)
+				.toProperties();
+
+		assertEquals(propsFromConfig, props);
 	}
 
 	@Override
