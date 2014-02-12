@@ -1,5 +1,7 @@
 package org.sharetomail.util.backup;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -11,9 +13,13 @@ import org.sharetomail.R;
 import org.sharetomail.util.Configuration;
 import org.sharetomail.util.Constants;
 
+import android.app.backup.BackupAgent;
+import android.app.backup.BackupDataInput;
+import android.app.backup.BackupDataOutput;
 import android.os.Environment;
+import android.os.ParcelFileDescriptor;
 
-public class ConfigurationBackupAgent {
+public class ConfigurationBackupAgent extends BackupAgent {
 	public static void onBackup(Configuration config) throws BackupException {
 		if (!isExternalStorageWriteable()) {
 			throw new BackupException(R.string.ext_storage_not_writable, null);
@@ -78,4 +84,27 @@ public class ConfigurationBackupAgent {
 						.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
 				Constants.CONFIGURATION_BACKUP_FILE);
 	}
+
+	@Override
+	public void onBackup(ParcelFileDescriptor oldState, BackupDataOutput data,
+			ParcelFileDescriptor newState) throws IOException {
+		// Create buffer stream and data output stream for our data
+		ByteArrayOutputStream bufStream = new ByteArrayOutputStream();
+		DataOutputStream outWriter = new DataOutputStream(bufStream);
+		// Write structured data
+		outWriter.writeUTF(mPlayerName);
+		// Send the data to the Backup Manager via the BackupDataOutput
+		byte[] buffer = bufStream.toByteArray();
+		int len = buffer.length;
+		data.writeEntityHeader(TOPSCORE_BACKUP_KEY, len);
+		data.writeEntityData(buffer, len);
+	}
+
+	@Override
+	public void onRestore(BackupDataInput data, int appVersionCode,
+			ParcelFileDescriptor newState) throws IOException {
+		// TODO Auto-generated method stub
+
+	}
+
 }
