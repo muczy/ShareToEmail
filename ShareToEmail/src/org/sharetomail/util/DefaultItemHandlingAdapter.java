@@ -18,7 +18,8 @@ public class DefaultItemHandlingAdapter<T> extends BaseAdapter {
 	private List<T> objects;
 	private T defaultItem;
 
-	public DefaultItemHandlingAdapter(Context context, List<T> objects, T defaultItem) {
+	public DefaultItemHandlingAdapter(Context context, List<T> objects,
+			T defaultItem) {
 		this.context = context;
 		this.objects = objects;
 		this.defaultItem = defaultItem;
