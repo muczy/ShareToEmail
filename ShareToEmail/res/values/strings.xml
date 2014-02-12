@@ -20,7 +20,7 @@
     <string name="error_while_creating_backup">Error while creating backup: %1$s</string>
     <string name="error_while_loading_backup">Error while loading backup: %1$s</string>
     <string name="backup_file_created">Backup file has been created here: %1$s</string>
-    <string name="backup_file_loaded">Backup file has been loaded!</string>
+    <string name="backup_file_loaded">Configuration has been restored from backup file!</string>
     <!-- About window strings -->
     <string name="about_text_version">Version: %1$s</string>
     <string name="about_text_logo_thanks_text">Original logo artwork was created by Alexandre Moore. Thanks for your work!\nHis site:</string>
