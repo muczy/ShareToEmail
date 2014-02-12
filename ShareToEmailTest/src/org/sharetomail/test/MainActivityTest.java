@@ -252,9 +252,7 @@ public class MainActivityTest extends
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText(solo.getCurrentActivity().getString(
 				org.sharetomail.R.string.action_about));
-
-		solo.searchText(solo.getCurrentActivity().getResources()
-				.getString(org.sharetomail.R.string.backup_config_button));
+		assertTrue(solo.waitForDialogToOpen());
 	}
 
 	@Override
