@@ -75,8 +75,6 @@ public class MainActivityTest extends
 		solo.assertCurrentActivity("Current activity is not "
 				+ AddModifyEmailAddressActivity.class.getName(),
 				AddModifyEmailAddressActivity.class);
-
-		solo.goBack();
 	}
 
 	public void testAddNewEmail_ValidEmail() {
@@ -248,8 +246,15 @@ public class MainActivityTest extends
 				org.sharetomail.R.string.action_settings));
 		solo.assertCurrentActivity("Current activity is not "
 				+ SettingsActivity.class.getName(), SettingsActivity.class);
+	}
 
-		solo.goBack();
+	public void testOpenAbout() {
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText(solo.getCurrentActivity().getString(
+				org.sharetomail.R.string.action_about));
+
+		solo.searchText(solo.getCurrentActivity().getResources()
+				.getString(org.sharetomail.R.string.backup_config_button));
 	}
 
 	@Override
