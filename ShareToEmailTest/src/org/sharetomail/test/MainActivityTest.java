@@ -151,7 +151,7 @@ public class MainActivityTest extends
 
 		solo.waitForActivity(MainActivity.class, 10000);
 
-		solo.clickLongOnView(((ListView) mainActivity
+		solo.clickLongOnView(((ListView) solo.getCurrentActivity()
 				.findViewById(org.sharetomail.R.id.emailAddressesListView))
 				.getChildAt(0));
 		solo.clickOnText(mainActivity
@@ -180,6 +180,39 @@ public class MainActivityTest extends
 		assertEquals(testModifiedEmail, ((ListView) solo.getCurrentActivity()
 				.findViewById(org.sharetomail.R.id.emailAddressesListView))
 				.getAdapter().getItem(0));
+	}
+
+	public void testDeleteEmail() {
+		solo.clickOnButton(mainActivity
+				.getString(org.sharetomail.R.string.add_email_address_button));
+
+		solo.waitForActivity(AddModifyEmailAddressActivity.class, 10000);
+
+		String testEmail = "test@example.org";
+
+		solo.enterText(
+				(EditText) solo.getCurrentActivity().findViewById(
+						org.sharetomail.R.id.emailAddressEditText), testEmail);
+
+		solo.clickOnButton(solo.getCurrentActivity().getString(
+				org.sharetomail.R.string.add_email_address_button));
+
+		solo.waitForActivity(MainActivity.class, 10000);
+
+		solo.clickLongOnView(((ListView) solo.getCurrentActivity()
+				.findViewById(org.sharetomail.R.id.emailAddressesListView))
+				.getChildAt(0));
+		solo.clickOnText(mainActivity
+				.getString(org.sharetomail.R.string.delete_email_address_menu_item));
+
+		solo.assertCurrentActivity("Current activity is not "
+				+ MainActivity.class.getName(), MainActivity.class);
+
+		assertEquals(
+				0,
+				((ListView) solo.getCurrentActivity().findViewById(
+						org.sharetomail.R.id.emailAddressesListView))
+						.getAdapter().getCount());
 	}
 
 	public void testOpenSettings() {
