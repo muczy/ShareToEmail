@@ -283,6 +283,22 @@ public class MainActivityTest extends
 						false));
 	}
 
+	public void testSettings_EmailSubjectPrefix() {
+		openSettings();
+
+		EditText subjectPrefixEditText = (EditText) solo.getCurrentActivity()
+				.findViewById(org.sharetomail.R.id.emailSubjectPrefixEditText);
+
+		solo.clearEditText(subjectPrefixEditText);
+		String testsubjectPrefix = "test email subject prefix";
+		solo.enterText(subjectPrefixEditText, testsubjectPrefix);
+
+		solo.goBack();
+
+		assertEquals(testsubjectPrefix, sharedPreferences.getString(
+				Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY, ""));
+	}
+
 	@Override
 	public void tearDown() throws Exception {
 		solo.finishOpenedActivities();
