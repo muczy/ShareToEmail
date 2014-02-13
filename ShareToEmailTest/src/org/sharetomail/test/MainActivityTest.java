@@ -57,7 +57,7 @@ public class MainActivityTest extends
 		KeyguardManager myKM = (KeyguardManager) getActivity()
 				.getSystemService(Context.KEYGUARD_SERVICE);
 		if (myKM.inKeyguardRestrictedInputMode()) {
-			throw new RuntimeException("Screen is locked! Please open it!");
+			fail("Screen is locked! Please open it!");
 		}
 	}
 
@@ -207,6 +207,9 @@ public class MainActivityTest extends
 		solo.assertCurrentActivity("Current activity is not "
 				+ MainActivity.class.getName(), MainActivity.class);
 
+		solo.waitForView(((ListView) solo.getCurrentActivity().findViewById(
+				org.sharetomail.R.id.emailAddressesListView)));
+
 		assertEquals(
 				0,
 				((ListView) solo.getCurrentActivity().findViewById(
@@ -235,6 +238,8 @@ public class MainActivityTest extends
 				.getCurrentActivity()
 				.getString(
 						org.sharetomail.R.string.set_as_default_email_address_menu_item));
+
+		solo.waitForActivity(MainActivity.class, 2000);
 
 		solo.clickLongOnView(((ListView) solo.getCurrentActivity()
 				.findViewById(org.sharetomail.R.id.emailAddressesListView))
@@ -308,6 +313,19 @@ public class MainActivityTest extends
 	}
 
 	public void testSettings_Backup() {
+		Editor editor = sharedPreferences.edit();
+
+		editor.putString(
+				Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
+				defaultEmail);
+		editor.putString(Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY,
+				Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY);
+		editor.putBoolean(
+				Constants.AUTO_USE_DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
+				false);
+
+		editor.commit();
+
 		openSettings();
 
 		solo.clickOnButton(solo.getCurrentActivity().getString(
