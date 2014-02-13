@@ -9,7 +9,7 @@
     tools:context=".AddModifyEmailAddressActivity" >
 
     <EditText
-        android:id="@+id/emailAddressTextView"
+        android:id="@+id/emailAddressEditText"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -24,7 +24,7 @@
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/emailAddressTextView"
+        android:layout_below="@+id/emailAddressEditText"
         android:layout_centerHorizontal="true"
         android:enabled="false"
         android:text="@string/add_email_address_button" />

@@ -34,6 +34,6 @@
     <string name="error_while_creating_backup">Hiba a mentés készítésekor: %1$s</string>
     <string name="error_while_loading_backup">Hiba a mentés betöltésekor: %1$s</string>
     <string name="backup_file_created">A mentésfájl elkészült itt: %1$s</string>
-    <string name="backup_file_loaded">A mentésfájl betöltésre került!</string>
+    <string name="backup_file_loaded">A konfiguráció visszatöltésre került a mentésfájlból!</string>
 
 </resources>

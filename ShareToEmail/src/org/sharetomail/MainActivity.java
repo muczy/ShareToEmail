@@ -74,6 +74,8 @@ public class MainActivity extends Activity {
 				&& getIntent().hasExtra(Intent.EXTRA_TEXT)
 				&& config.isAutoUseDefaultEmailAddress()) {
 			sendEmail(config.getDefaultEmailAddress());
+
+			return;
 		}
 
 		initWidgets();

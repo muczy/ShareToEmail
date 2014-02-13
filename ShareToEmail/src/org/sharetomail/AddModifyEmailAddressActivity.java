@@ -50,7 +50,7 @@ public class AddModifyEmailAddressActivity extends Activity {
 				Constants.SHARED_PREFERENCES_NAME, MODE_PRIVATE));
 
 		final Button addModifyEmailAddressButton = (Button) findViewById(R.id.addModifyEmailAddressButton);
-		final TextView emailAddressTextView = (TextView) findViewById(R.id.emailAddressTextView);
+		final TextView emailAddressTextView = (TextView) findViewById(R.id.emailAddressEditText);
 
 		// Custom text change listener to enable/disable the add/modify email
 		// address button when the input text changes.
