@@ -37,4 +37,5 @@ public class Constants {
 			.toString();
 
 	public static final String CONFIGURATION_BACKUP_FILE = "sharetoemail-backup.properties";
+	public static final String SHARETOEMAIL_BACKUP_KEY = "SHARETOEMAIL_BACKUP_KEY";
 }

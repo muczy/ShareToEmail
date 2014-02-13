@@ -51,8 +51,16 @@ public class Configuration {
 	}
 
 	public List<String> getEmailAddresses() {
-		return parseEmailAddresses(sharedPreferences.getString(
-				Constants.EMAIL_ADDRESSES_SHARED_PREFERENCES_KEY, ""));
+		return parseEmailAddresses(getEmailAddressesAsString());
+	}
+
+	public String getEmailAddressesAsString() {
+		return sharedPreferences.getString(
+				Constants.EMAIL_ADDRESSES_SHARED_PREFERENCES_KEY, "");
+	}
+
+	public void setEmailAddressesFromString(String string) {
+		storeEmailAddresses(parseEmailAddresses(string));
 	}
 
 	public void addEmailAddress(String item) {
