@@ -7,7 +7,7 @@
     <string name="dialog_input_is_not_in_email_format">A megadott érték nem e-mail formátumú!</string>
     <string name="send_email">E-mail küldése</string>
     <!-- Title strings -->
-    <string name="app_name">Share to email</string>
+    <string name="app_name">Share to Email</string>
     <string name="title_activity_add_email_address">E-mail cím hozzáadása</string>
     <string name="title_activity_modify_email_address">E-mail cím módosítása</string>
     <string name="title_activity_settings">Beállítások</string>

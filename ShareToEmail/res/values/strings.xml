@@ -7,7 +7,7 @@
     <string name="dialog_input_is_not_in_email_format">Input text is not in email format!</string>
     <string name="send_email">Send email</string>
     <!-- Title strings -->
-    <string name="app_name">Share to email</string>
+    <string name="app_name">Share to Email</string>
     <string name="title_activity_add_email_address">Add email address</string>
     <string name="title_activity_modify_email_address">Modify email address</string>
     <string name="title_activity_settings">Settings</string>
