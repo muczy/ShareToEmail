@@ -18,14 +18,16 @@ package org.sharetomail;
 import org.sharetomail.util.Configuration;
 import org.sharetomail.util.Constants;
 import org.sharetomail.util.DefaultItemHandlingAdapter;
+import org.sharetomail.util.EmailAddress;
+
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.util.Linkify;
 import android.util.Log;
@@ -49,12 +51,12 @@ public class MainActivity extends Activity {
 	private static final String TAG = MainActivity.class.getName();
 
 	private ListView emailAddressesListView;
-	private DefaultItemHandlingAdapter<String> emailAddressesAdapter;
+	private DefaultItemHandlingAdapter<EmailAddress> emailAddressesAdapter;
 
 	private Configuration config;
 	private static Resources mResources;
 
-	private String selectedItem = "";
+	private EmailAddress selectedItem;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +72,7 @@ public class MainActivity extends Activity {
 
 		// If we have a default email address and the auto use option is set
 		// then don't even prompt the user.
-		if (!config.getDefaultEmailAddress().isEmpty()
+		if (!config.getDefaultEmailAddress().getEmailAddress().isEmpty()
 				&& getIntent().hasExtra(Intent.EXTRA_TEXT)
 				&& config.isAutoUseDefaultEmailAddress()) {
 			sendEmail(config.getDefaultEmailAddress());
@@ -80,9 +82,11 @@ public class MainActivity extends Activity {
 
 		initWidgets();
 
-		emailAddressesAdapter = new DefaultItemHandlingAdapter<String>(this,
-				config.getEmailAddresses(), config.getDefaultEmailAddress());
+		emailAddressesAdapter = new DefaultItemHandlingAdapter<EmailAddress>(
+				this, config.getEmailAddresses(),
+				config.getDefaultEmailAddress());
 		emailAddressesListView.setAdapter(emailAddressesAdapter);
+
 	}
 
 	public static Resources getResourcesObject() {
@@ -102,8 +106,7 @@ public class MainActivity extends Activity {
 						@Override
 						public void onItemClick(AdapterView<?> parent,
 								View view, int position, long id) {
-							sendEmail(String.valueOf(emailAddressesListView
-									.getItemAtPosition(position)));
+							sendEmail(emailAddressesAdapter.getItem(position));
 						}
 					});
 		}
@@ -115,8 +118,7 @@ public class MainActivity extends Activity {
 					@Override
 					public boolean onItemLongClick(AdapterView<?> parent,
 							View view, int position, long id) {
-						selectedItem = emailAddressesListView
-								.getItemAtPosition(position).toString();
+						selectedItem = emailAddressesAdapter.getItem(position);
 						return false;
 					}
 				});
@@ -134,9 +136,16 @@ public class MainActivity extends Activity {
 		});
 	}
 
-	private void sendEmail(String emailAddress) {
-		Intent sendMailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-				Constants.MAILTO_SCHEME, emailAddress, null));
+	private void sendEmail(EmailAddress emailAddress) {
+		Intent sendMailIntent = new Intent(Intent.ACTION_MAIN);
+
+		sendMailIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+		sendMailIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+				| Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+		ComponentName componentName = new ComponentName(
+				emailAddress.getEmailAppName(),
+				emailAddress.getEmailAppPackageName());
+		sendMailIntent.setComponent(componentName);
 
 		String textFromIntent = getIntent().getStringExtra(Intent.EXTRA_TEXT);
 
@@ -206,8 +215,8 @@ public class MainActivity extends Activity {
 			emailAddressesAdapter.setDefaultItem(selectedItem);
 			return true;
 		case R.id.unsetAsDefaultEmailAddressItem:
-			config.setDefaultEmailAddress("");
-			emailAddressesAdapter.setDefaultItem("");
+			config.clearDefaultEmailAddress();
+			emailAddressesAdapter.setDefaultItem(null);
 			return true;
 		case R.id.modifyEmailAddressItem:
 			Intent modifyEmailAddressIntent = new Intent(this,
@@ -221,7 +230,7 @@ public class MainActivity extends Activity {
 			config.removeEmailAddress(selectedItem);
 
 			if (config.getDefaultEmailAddress().equals(selectedItem)) {
-				config.setDefaultEmailAddress("");
+				config.clearDefaultEmailAddress();
 			}
 
 			refreshEmailList();
@@ -304,6 +313,7 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		refreshEmailList();
+
 		super.onActivityResult(requestCode, resultCode, data);
 	}
 

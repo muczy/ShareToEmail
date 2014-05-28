@@ -8,8 +8,11 @@ import org.sharetomail.MainActivity;
 import org.sharetomail.R;
 
 import android.content.SharedPreferences;
+import android.util.Log;
 
 public class Configuration {
+
+	private static final String TAG = Configuration.class.getName();
 
 	private SharedPreferences sharedPreferences;
 
@@ -17,28 +20,34 @@ public class Configuration {
 		this.sharedPreferences = sharedPreferences;
 	}
 
-	private List<String> parseEmailAddresses(String rawEmailAddressesString) {
-		List<String> result = new LinkedList<String>();
+	private List<EmailAddress> parseEmailAddresses(
+			String rawEmailAddressesString) {
+		List<EmailAddress> result = new LinkedList<EmailAddress>();
 
 		String[] rawEmailAddresses = rawEmailAddressesString
-				.split(Constants.SPLIT_REGEXP);
+				.split(Constants.EMAIL_ADDRESSES_SPLIT_REGEXP);
 
 		for (int i = 0; i < rawEmailAddresses.length; i++) {
 			if (!rawEmailAddresses[i].isEmpty()) {
-				result.add(rawEmailAddresses[i]);
+				try {
+					result.add(new EmailAddress(rawEmailAddresses[i]));
+				} catch (ParseException e) {
+					Log.e(TAG, "Failed to parse line \"" + rawEmailAddresses[i]
+							+ "\" ==> skipping!");
+				}
 			}
 		}
 
 		return result;
 	}
 
-	private void storeEmailAddresses(List<String> emailAddresses) {
+	private void storeEmailAddresses(List<EmailAddress> emailAddresses) {
 		StringBuilder builder = new StringBuilder();
 
 		for (int i = 0; i < emailAddresses.size(); i++) {
-			builder.append(emailAddresses.get(i));
+			builder.append(emailAddresses.get(i).toConfigurationLine());
 			if (i != emailAddresses.size() - 1) {
-				builder.append(Constants.SPLIT_REGEXP);
+				builder.append(Constants.EMAIL_ADDRESSES_SPLIT_REGEXP);
 			}
 		}
 
@@ -50,40 +59,58 @@ public class Configuration {
 		editor.commit();
 	}
 
-	public List<String> getEmailAddresses() {
+	public List<EmailAddress> getEmailAddresses() {
 		return parseEmailAddresses(sharedPreferences.getString(
 				Constants.EMAIL_ADDRESSES_SHARED_PREFERENCES_KEY, ""));
 	}
 
-	public void addEmailAddress(String item) {
-		List<String> emailAddresses = getEmailAddresses();
+	public void addEmailAddress(EmailAddress item) {
+		List<EmailAddress> emailAddresses = getEmailAddresses();
 		emailAddresses.add(item);
 		storeEmailAddresses(emailAddresses);
 	}
 
-	public void setEmailAddress(int location, String item) {
-		List<String> emailAddresses = getEmailAddresses();
+	public void setEmailAddress(int location, EmailAddress item) {
+		List<EmailAddress> emailAddresses = getEmailAddresses();
 		emailAddresses.set(location, item);
 		storeEmailAddresses(emailAddresses);
 	}
 
-	public void removeEmailAddress(String item) {
-		List<String> emailAddresses = getEmailAddresses();
+	public void removeEmailAddress(EmailAddress item) {
+		List<EmailAddress> emailAddresses = getEmailAddresses();
 		emailAddresses.remove(item);
 		storeEmailAddresses(emailAddresses);
 	}
 
-	public String getDefaultEmailAddress() {
-		return sharedPreferences.getString(
+	public EmailAddress getDefaultEmailAddress() {
+		String rawEmailAddress = sharedPreferences.getString(
 				Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY, "");
+		EmailAddress emailAddress = null;
+		try {
+			emailAddress = new EmailAddress(rawEmailAddress);
+		} catch (ParseException e) {
+			Log.e(TAG, "Failed to parse line \"" + rawEmailAddress
+					+ "\" ==> skipping!");
+			emailAddress = new EmailAddress();
+		}
+
+		return emailAddress;
 	}
 
-	public void setDefaultEmailAddress(String defaultEmailAddress) {
+	public void setDefaultEmailAddress(EmailAddress defaultEmailAddress) {
 		SharedPreferences.Editor editor = sharedPreferences.edit();
 
 		editor.putString(
 				Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
-				defaultEmailAddress);
+				defaultEmailAddress.toConfigurationLine());
+
+		editor.commit();
+	}
+
+	public void clearDefaultEmailAddress() {
+		SharedPreferences.Editor editor = sharedPreferences.edit();
+
+		editor.remove(Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY);
 
 		editor.commit();
 	}
@@ -127,19 +154,19 @@ public class Configuration {
 
 		StringBuilder builder = new StringBuilder();
 
-		List<String> emailAddresses = getEmailAddresses();
+		List<EmailAddress> emailAddresses = getEmailAddresses();
 
 		for (int i = 0; i < emailAddresses.size(); i++) {
-			builder.append(emailAddresses.get(i));
+			builder.append(emailAddresses.get(i).toConfigurationLine());
 			if (i != emailAddresses.size() - 1) {
-				builder.append(Constants.SPLIT_REGEXP);
+				builder.append(Constants.EMAIL_ADDRESSES_SPLIT_REGEXP);
 			}
 		}
 
 		properties.put(Constants.EMAIL_ADDRESSES_SHARED_PREFERENCES_KEY,
 				builder.toString());
 		properties.put(Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
-				getDefaultEmailAddress());
+				getDefaultEmailAddress().toConfigurationLine());
 		properties.put(Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY,
 				getEmailSubjectPrefix());
 		properties
@@ -158,8 +185,16 @@ public class Configuration {
 
 		editor.commit();
 
-		setDefaultEmailAddress(properties.getProperty(
-				Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY, ""));
+		String rawEmailAddress = properties.getProperty(
+				Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY, "");
+		if (!rawEmailAddress.isEmpty()) {
+			try {
+				setDefaultEmailAddress(new EmailAddress(rawEmailAddress));
+			} catch (ParseException e) {
+				Log.e(TAG, "Failed to parse line \"" + rawEmailAddress
+						+ "\" ==> skipping!");
+			}
+		}
 
 		setEmailSubjectPrefix(properties.getProperty(
 				Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY, ""));

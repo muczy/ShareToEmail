@@ -20,12 +20,21 @@
     </EditText>
 
     <Button
-        android:id="@+id/addModifyEmailAddressButton"
-        style="?android:attr/buttonStyleSmall"
+        android:id="@+id/emailAppButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/emailAddressEditText"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="52dp"
+        android:text="@string/no_app_specified" />
+
+    <Button
+        android:id="@+id/addModifyEmailAddressButton"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
         android:enabled="false"
         android:text="@string/add_email_address_button" />
 

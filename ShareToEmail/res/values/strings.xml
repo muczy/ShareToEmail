@@ -11,6 +11,7 @@
     <string name="title_activity_add_email_address">Add email address</string>
     <string name="title_activity_modify_email_address">Modify email address</string>
     <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_email_app_selector">Email application select</string>
     <!-- Backup strings -->
     <string name="backup_config_button">Backup configuration</string>
     <string name="restore_config_button">Restore configuration</string>
@@ -37,5 +38,6 @@
     <string name="unset_as_default_email_address_menu_item">Unset as default email address</string>
     <string name="auto_use_default_email_address_setting_text">Automatically use the default email address</string>
     <string name="subject_prefix_setting_text">Email subject prefix:</string>
+    <string name="no_app_specified">No application is specified</string>
 
 </resources>

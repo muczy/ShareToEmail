@@ -31,7 +31,7 @@ public class DefaultItemHandlingAdapter<T> extends BaseAdapter {
 	}
 
 	@Override
-	public Object getItem(int position) {
+	public T getItem(int position) {
 		return objects.get(position);
 	}
 
@@ -55,7 +55,7 @@ public class DefaultItemHandlingAdapter<T> extends BaseAdapter {
 				.findViewById(android.R.id.text1);
 
 		// Make the default item bold.
-		if (defaultItem.equals(objects.get(position))) {
+		if (objects.get(position).equals(defaultItem)) {
 			SpannableString spannableString = new SpannableString(
 					String.valueOf(objects.get(position)));
 			spannableString.setSpan(new StyleSpan(Typeface.BOLD), 0,
