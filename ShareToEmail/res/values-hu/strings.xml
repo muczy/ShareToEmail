@@ -36,5 +36,6 @@
     <string name="error_while_loading_backup">Hiba a mentés betöltésekor: %1$s</string>
     <string name="backup_file_created">A mentésfájl elkészült itt: %1$s</string>
     <string name="backup_file_loaded">A konfiguráció visszatöltésre került a mentésfájlból!</string>
+    <string name="email_app_image_content_description">Email program ikon</string>
 
 </resources>

@@ -18,6 +18,7 @@ package org.sharetomail;
 import org.sharetomail.util.Configuration;
 import org.sharetomail.util.Constants;
 import org.sharetomail.util.EmailAddress;
+import org.sharetomail.util.Util;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -39,9 +40,10 @@ import android.widget.Toast;
 public class AddModifyEmailAddressActivity extends Activity {
 
 	private Configuration config;
-	private String origEmail;
+	private EmailAddress origEmail;
 	private String emailAppName = "";
 	private String emailAppPackageName = "";
+	private Button emailAppButton;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +57,7 @@ public class AddModifyEmailAddressActivity extends Activity {
 
 		final Button addModifyEmailAddressButton = (Button) findViewById(R.id.addModifyEmailAddressButton);
 		final TextView emailAddressTextView = (TextView) findViewById(R.id.emailAddressEditText);
-		Button emailAppButton = (Button) findViewById(R.id.emailAppButton);
+		emailAppButton = (Button) findViewById(R.id.emailAppButton);
 
 		// Custom text change listener to enable/disable the add/modify email
 		// address button when the input text changes.
@@ -143,14 +145,18 @@ public class AddModifyEmailAddressActivity extends Activity {
 		// If we get the email address in the intent then we modify it so fill
 		// the TextView and rename labels.
 		if (getIntent().hasExtra(Constants.ORIG_EMAIL_ADDRESS_INTENT_KEY)) {
+			origEmail = getIntent().getParcelableExtra(
+					Constants.ORIG_EMAIL_ADDRESS_INTENT_KEY);
+
+			emailAppName = origEmail.getEmailAppName();
+			emailAppPackageName = origEmail.getEmailAppPackageName();
+
 			setTitle(R.string.title_activity_modify_email_address);
 			addModifyEmailAddressButton
 					.setText(R.string.modify_email_address_button);
-			origEmail = getIntent().getStringExtra(
-					Constants.ORIG_EMAIL_ADDRESS_INTENT_KEY);
-			emailAddressTextView.setText(origEmail);
-			emailAppButton.setText(getIntent().getStringExtra(
-					Constants.ORIG_EMAIL_APP_INTENT_KEY));
+			emailAddressTextView.setText(origEmail.getEmailAddress());
+			emailAppButton.setText(Util.getEmailAppLabel(emailAppPackageName,
+					getPackageManager()));
 		}
 	}
 
@@ -202,6 +208,9 @@ public class AddModifyEmailAddressActivity extends Activity {
 					.getStringExtra(Constants.EMAIL_APP_NAME_INTENT_KEY);
 			emailAppPackageName = data
 					.getStringExtra(Constants.EMAIL_APP_PACKAGE_NAME_INTENT_KEY);
+
+			emailAppButton.setText(Util.getEmailAppLabel(emailAppPackageName,
+					getPackageManager()));
 		}
 	}
 

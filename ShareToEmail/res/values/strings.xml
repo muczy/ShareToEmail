@@ -39,5 +39,6 @@
     <string name="auto_use_default_email_address_setting_text">Automatically use the default email address</string>
     <string name="subject_prefix_setting_text">Email subject prefix:</string>
     <string name="no_app_specified">No application is specified</string>
+    <string name="email_app_image_content_description">Email application icon</string>
 
 </resources>

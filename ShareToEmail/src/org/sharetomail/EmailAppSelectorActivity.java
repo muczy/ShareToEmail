@@ -88,8 +88,8 @@ public class EmailAppSelectorActivity extends ActionBarActivity implements
 				emailAppListAdapter.getItem(position).activityInfo.name);
 		data.putExtra(Constants.EMAIL_APP_PACKAGE_NAME_INTENT_KEY,
 				emailAppListAdapter.getItem(position).activityInfo.packageName);
-		setResult(RESULT_OK, data);
-		super.finish();
+		setResult(Constants.EMAIL_APP_SELECTOR_ACTIVITY_REQUEST_CODE, data);
+		finish();
 	}
 
 	public ListAdapter getEmailAppListAdapter() {
