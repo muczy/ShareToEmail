@@ -24,6 +24,7 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+
 import com.robotium.solo.Solo;
 
 public class MainActivityTest extends
@@ -107,7 +108,8 @@ public class MainActivityTest extends
 				.findViewById(org.sharetomail.R.id.emailAddressesListView))
 				.getAdapter();
 
-		assertEquals(testEmail, adapter.getItem(adapter.getCount() - 1));
+		assertEquals(testEmail,
+				String.valueOf(adapter.getItem(adapter.getCount() - 1)));
 	}
 
 	public void testAddNewEmail_ValidEmailWithoutTLD() {
@@ -132,7 +134,8 @@ public class MainActivityTest extends
 				.findViewById(org.sharetomail.R.id.emailAddressesListView))
 				.getAdapter();
 
-		assertEquals(testEmail, adapter.getItem(adapter.getCount() - 1));
+		assertEquals(testEmail,
+				String.valueOf(adapter.getItem(adapter.getCount() - 1)));
 	}
 
 	public void testAddNewEmail_InvalidEmail() {
