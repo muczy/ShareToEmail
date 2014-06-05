@@ -28,8 +28,8 @@ import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.Patterns;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -38,6 +38,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class AddModifyEmailAddressActivity extends Activity {
+
+	protected static final String TAG = AddModifyEmailAddressActivity.class
+			.getName();
 
 	private Configuration config;
 	private EmailAddress origEmail;
@@ -111,10 +114,14 @@ public class AddModifyEmailAddressActivity extends Activity {
 						// Original email address was not found (somebody
 						// removed it in the mean time?) so we add it.
 						if (position < 0) {
+							Log.w(TAG,
+									"Email address \""
+											+ origEmail.getEmailAddress()
+											+ "\" was not found which is bad. Adding it.");
 							config.addEmailAddress(emailAddress);
+						} else {
+							config.setEmailAddress(position, emailAddress);
 						}
-
-						config.setEmailAddress(position, emailAddress);
 					} else {
 						config.addEmailAddress(emailAddress);
 					}
@@ -155,8 +162,8 @@ public class AddModifyEmailAddressActivity extends Activity {
 			addModifyEmailAddressButton
 					.setText(R.string.modify_email_address_button);
 			emailAddressTextView.setText(origEmail.getEmailAddress());
-			emailAppButton.setText(Util.getEmailAppLabel(emailAppPackageName,
-					getPackageManager()));
+
+			setEmailAppButtonText();
 		}
 	}
 
@@ -175,13 +182,6 @@ public class AddModifyEmailAddressActivity extends Activity {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 			getActionBar().setDisplayHomeAsUpEnabled(true);
 		}
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.add_email_address, menu);
-		return true;
 	}
 
 	@Override
@@ -209,9 +209,22 @@ public class AddModifyEmailAddressActivity extends Activity {
 			emailAppPackageName = data
 					.getStringExtra(Constants.EMAIL_APP_PACKAGE_NAME_INTENT_KEY);
 
-			emailAppButton.setText(Util.getEmailAppLabel(emailAppPackageName,
-					getPackageManager()));
+			setEmailAppButtonText();
 		}
+	}
+
+	private void setEmailAppButtonText() {
+		CharSequence emailAppLabel = Util.getEmailAppLabel(emailAppPackageName,
+				getPackageManager());
+
+		// The originally selected app might got changed or uninstalled.
+		if (emailAppLabel == null || emailAppLabel.length() == 0) {
+			emailAppName = "";
+			emailAppPackageName = "";
+			emailAppLabel = getString(R.string.app_selector);
+		}
+
+		emailAppButton.setText(emailAppLabel);
 	}
 
 }

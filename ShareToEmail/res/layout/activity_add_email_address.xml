@@ -26,7 +26,7 @@
         android:layout_below="@+id/emailAddressEditText"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="52dp"
-        android:text="@string/no_app_specified" />
+        android:text="@string/app_selector" />
 
     <Button
         android:id="@+id/addModifyEmailAddressButton"

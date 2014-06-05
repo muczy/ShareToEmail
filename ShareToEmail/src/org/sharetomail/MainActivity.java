@@ -22,12 +22,14 @@ import org.sharetomail.util.EmailAddress;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ComponentName;
+import android.app.AlertDialog.Builder;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.util.Linkify;
 import android.util.Log;
@@ -137,26 +139,86 @@ public class MainActivity extends Activity {
 	}
 
 	private void sendEmail(EmailAddress emailAddress) {
+		String textFromIntent = getIntent().getStringExtra(Intent.EXTRA_TEXT);
+
+		String subjectFromIntent = getSubject(textFromIntent);
+
+		if (emailAddress.getEmailAppPackageName() != null
+				&& !emailAddress.getEmailAppPackageName().isEmpty()) {
+			startSpecifiedEmailApp(emailAddress, subjectFromIntent,
+					textFromIntent);
+		} else {
+			startEmailAppSelector(emailAddress, subjectFromIntent,
+					textFromIntent);
+		}
+	}
+
+	private void startEmailAppSelector(EmailAddress emailAddress,
+			String subject, String text) {
+		Intent sendMailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+				Constants.MAILTO_SCHEME, emailAddress.getEmailAddress(), null));
+
+		sendMailIntent.putExtra(Intent.EXTRA_SUBJECT,
+				config.getEmailSubjectPrefix() + subject);
+		sendMailIntent.putExtra(Intent.EXTRA_TEXT, text);
+
+		startActivity(Intent.createChooser(sendMailIntent,
+				getString(R.string.send_email)));
+
+		finish();
+	}
+
+	private void startSpecifiedEmailApp(final EmailAddress emailAddress,
+			String subject, String text) {
 		Intent sendMailIntent = new Intent(Intent.ACTION_MAIN);
 
 		sendMailIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 		sendMailIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
 				| Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-		ComponentName componentName = new ComponentName(
-				emailAddress.getEmailAppName(),
-				emailAddress.getEmailAppPackageName());
-		sendMailIntent.setComponent(componentName);
 
-		String textFromIntent = getIntent().getStringExtra(Intent.EXTRA_TEXT);
-
-		String subjectFromIntent = getSubject(textFromIntent);
-
+		sendMailIntent.putExtra(Intent.EXTRA_EMAIL,
+				new String[] { emailAddress.getEmailAddress() });
 		sendMailIntent.putExtra(Intent.EXTRA_SUBJECT,
-				config.getEmailSubjectPrefix() + subjectFromIntent);
-		sendMailIntent.putExtra(Intent.EXTRA_TEXT, textFromIntent);
+				config.getEmailSubjectPrefix() + subject);
+		sendMailIntent.putExtra(Intent.EXTRA_TEXT, text);
 
-		startActivity(Intent.createChooser(sendMailIntent,
-				getString(R.string.send_email)));
+		sendMailIntent.setClassName(emailAddress.getEmailAppPackageName(),
+				emailAddress.getEmailAppName());
+
+		try {
+			startActivity(sendMailIntent);
+		} catch (ActivityNotFoundException e) {
+			Builder builder = new AlertDialog.Builder(this);
+			builder.setMessage(R.string.email_app_not_found);
+			builder.setPositiveButton(R.string.modify_button,
+					new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							Intent modifyEmailAddressIntent = new Intent(
+									MainActivity.this,
+									AddModifyEmailAddressActivity.class);
+							modifyEmailAddressIntent.putExtra(
+									Constants.ORIG_EMAIL_ADDRESS_INTENT_KEY,
+									emailAddress);
+							startActivityForResult(
+									modifyEmailAddressIntent,
+									Constants.MODIFY_EMAIL_ADDRESS_ACTIVITY_REQUEST_CODE);
+						}
+					});
+			builder.setNegativeButton(android.R.string.cancel,
+					new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							return;
+						}
+					});
+			AlertDialog dialog = builder.create();
+			dialog.show();
+
+			return;
+		}
 
 		finish();
 	}

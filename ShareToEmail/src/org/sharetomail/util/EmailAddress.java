@@ -110,4 +110,21 @@ public class EmailAddress implements Parcelable {
 	public String toString() {
 		return emailAddress;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof EmailAddress) {
+			EmailAddress otherEmailAddress = (EmailAddress) o;
+
+			if (this.emailAddress.equals(otherEmailAddress.emailAddress)
+					&& this.emailAppName.equals(otherEmailAddress.emailAppName)
+					&& this.emailAppPackageName
+							.equals(otherEmailAddress.emailAppPackageName)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 }

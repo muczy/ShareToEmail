@@ -83,15 +83,19 @@ public class Configuration {
 	}
 
 	public EmailAddress getDefaultEmailAddress() {
-		String rawEmailAddress = sharedPreferences.getString(
-				Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY, "");
-		EmailAddress emailAddress = null;
-		try {
-			emailAddress = new EmailAddress(rawEmailAddress);
-		} catch (ParseException e) {
-			Log.e(TAG, "Failed to parse line \"" + rawEmailAddress
-					+ "\" ==> skipping!");
-			emailAddress = new EmailAddress();
+		EmailAddress emailAddress = new EmailAddress();
+
+		if (sharedPreferences
+				.contains(Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY)) {
+			String rawEmailAddress = sharedPreferences.getString(
+					Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY, "");
+			try {
+				emailAddress = new EmailAddress(rawEmailAddress);
+			} catch (ParseException e) {
+				Log.e(TAG, "Failed to parse line \"" + rawEmailAddress
+						+ "\" ==> skipping!");
+				emailAddress = new EmailAddress();
+			}
 		}
 
 		return emailAddress;

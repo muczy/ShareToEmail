@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,14 +32,6 @@ public class EmailAppSelectorActivity extends ActionBarActivity implements
 			getSupportFragmentManager().beginTransaction()
 					.add(R.id.container, new PlaceholderFragment()).commit();
 		}
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.email_app_selector, menu);
-		return true;
 	}
 
 	@Override
@@ -84,10 +75,22 @@ public class EmailAppSelectorActivity extends ActionBarActivity implements
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
 		Intent data = new Intent();
-		data.putExtra(Constants.EMAIL_APP_NAME_INTENT_KEY,
-				emailAppListAdapter.getItem(position).activityInfo.name);
-		data.putExtra(Constants.EMAIL_APP_PACKAGE_NAME_INTENT_KEY,
-				emailAppListAdapter.getItem(position).activityInfo.packageName);
+
+		if (emailAppListAdapter.getItem(position).activityInfo == null) {
+			data.putExtra(Constants.EMAIL_APP_NAME_INTENT_KEY, "");
+		} else {
+			data.putExtra(Constants.EMAIL_APP_NAME_INTENT_KEY,
+					emailAppListAdapter.getItem(position).activityInfo.name);
+		}
+
+		if (emailAppListAdapter.getItem(position).activityInfo == null) {
+			data.putExtra(Constants.EMAIL_APP_PACKAGE_NAME_INTENT_KEY, "");
+		} else {
+			data.putExtra(
+					Constants.EMAIL_APP_PACKAGE_NAME_INTENT_KEY,
+					emailAppListAdapter.getItem(position).activityInfo.packageName);
+		}
+
 		setResult(Constants.EMAIL_APP_SELECTOR_ACTIVITY_REQUEST_CODE, data);
 		finish();
 	}

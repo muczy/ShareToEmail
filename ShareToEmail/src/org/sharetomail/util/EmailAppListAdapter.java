@@ -21,21 +21,29 @@ public class EmailAppListAdapter extends BaseAdapter {
 
 	private Context context;
 
-	private List<ResolveInfo> emailApps;
+	private List<ResolveInfo> emailApps = new LinkedList<ResolveInfo>();
 	private PackageManager packageManager;
 
 	public EmailAppListAdapter(Context context, PackageManager packageManager) {
 		this.context = context;
 		this.packageManager = packageManager;
 
+		// "Application selector" empty app.
+		emailApps.add(new ResolveInfo());
+
 		Intent sendMailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
 				Constants.MAILTO_SCHEME, "", null));
-		emailApps = packageManager.queryIntentActivities(sendMailIntent,
-				PackageManager.MATCH_DEFAULT_ONLY);
+		emailApps.addAll(packageManager.queryIntentActivities(sendMailIntent,
+				PackageManager.MATCH_DEFAULT_ONLY));
 
 		if (emailApps == null) {
 			emailApps = new LinkedList<ResolveInfo>();
 		}
+	}
+
+	public void add(ResolveInfo resolveInfo) {
+		emailApps.add(resolveInfo);
+		notifyDataSetChanged();
 	}
 
 	@Override
@@ -56,23 +64,30 @@ public class EmailAppListAdapter extends BaseAdapter {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View rowView = convertView;
-		if (rowView == null) {
-			LayoutInflater inflater = (LayoutInflater) context
-					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			rowView = inflater.inflate(R.layout.email_app_list_item, parent,
-					false);
-
-		}
+		LayoutInflater inflater = (LayoutInflater) context
+				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		rowView = inflater.inflate(R.layout.email_app_list_item, parent, false);
 
 		ImageView emailAppImageView = (ImageView) rowView
 				.findViewById(R.id.emailAppImageView);
 		TextView emailAppTitleTextView = (TextView) rowView
 				.findViewById(R.id.emailAppTitleTextView);
 
-		emailAppImageView.setImageDrawable(emailApps.get(position).loadIcon(
-				packageManager));
-		emailAppTitleTextView.setText(emailApps.get(position).loadLabel(
-				packageManager));
+		try {
+			emailAppImageView.setImageDrawable(emailApps.get(position)
+					.loadIcon(packageManager));
+		} catch (IllegalStateException e) {
+			// TODO: handle? empty app icon?
+		}
+
+		CharSequence appLabel;
+		try {
+			appLabel = emailApps.get(position).loadLabel(packageManager);
+		} catch (IllegalStateException e) {
+			appLabel = context.getString(R.string.app_selector);
+		}
+
+		emailAppTitleTextView.setText(appLabel);
 
 		return rowView;
 	}
