@@ -38,7 +38,7 @@
             android:parentActivityName="org.sharetomail.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.emailtome.MainActivity" />
+                android:value="org.sharetomail.MainActivity" />
         </activity>
         <activity
             android:name="org.sharetomail.SettingsActivity"
@@ -46,11 +46,15 @@
             android:parentActivityName="org.sharetomail.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.emailtome.MainActivity" />
+                android:value="org.sharetomail.MainActivity" />
         </activity>
         <activity android:theme="@style/Theme.AppCompat"
             android:name="org.sharetomail.EmailAppSelectorActivity"
-            android:label="@string/title_activity_email_app_selector" >
+            android:label="@string/title_activity_email_app_selector"
+            android:parentActivityName="org.sharetomail.AddModifyEmailAddressActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.sharetomail.AddModifyEmailAddressActivity" />
         </activity>
     </application>
 

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.sharetomail.AddModifyEmailAddressActivity;
+import org.sharetomail.EmailAppSelectorActivity;
 import org.sharetomail.MainActivity;
 import org.sharetomail.SettingsActivity;
 import org.sharetomail.util.Configuration;
@@ -166,6 +167,61 @@ public class MainActivityTest extends
 								.getString(
 										org.sharetomail.R.string.dialog_input_is_not_in_email_format),
 						1, 1000));
+	}
+
+	public void testAddNewEmail_WithSpecificEmailApp() {
+		// Add test email address.
+		solo.clickOnButton(solo.getCurrentActivity().getString(
+				org.sharetomail.R.string.add_email_address_button));
+
+		solo.waitForActivity(AddModifyEmailAddressActivity.class, 10000);
+
+		String testEmail = "test@example.org";
+
+		solo.enterText(
+				(EditText) solo.getCurrentActivity().findViewById(
+						org.sharetomail.R.id.emailAddressEditText), testEmail);
+
+		// Set an email app for the test email address.
+		solo.clickOnButton(solo.getCurrentActivity().getString(
+				org.sharetomail.R.string.app_selector));
+
+		solo.waitForActivity(EmailAppSelectorActivity.class, 10000);
+
+		ListView emailAppListView = (ListView) solo.getCurrentActivity()
+				.findViewById(org.sharetomail.R.id.emailAppListView);
+
+		if (emailAppListView.getChildCount() < 2) {
+			fail("No email apps were found. Please install at least one!");
+		}
+
+		int selectedAppPosition = 1;
+		String selectedApp = String.valueOf(emailAppListView.getAdapter()
+				.getItem(selectedAppPosition));
+		solo.clickOnView(emailAppListView.getChildAt(selectedAppPosition));
+		solo.waitForActivity(AddModifyEmailAddressActivity.class, 10000);
+
+		// Save the test email address.
+		solo.clickOnButton(solo.getCurrentActivity().getString(
+				org.sharetomail.R.string.add_email_address_button));
+
+		solo.assertCurrentActivity("Current activity is not "
+				+ MainActivity.class.getName(), MainActivity.class);
+
+		// Open email address modification activity and verify email app.
+		ListView addressListView = (ListView) solo.getCurrentActivity()
+				.findViewById(org.sharetomail.R.id.emailAddressesListView);
+		solo.clickLongOnView(addressListView.getChildAt(addressListView
+				.getAdapter().getCount() - 1));
+
+		solo.clickOnText(solo.getCurrentActivity().getString(
+				org.sharetomail.R.string.modify_email_address_menu_item));
+
+		solo.assertCurrentActivity("Current activity is not "
+				+ AddModifyEmailAddressActivity.class.getName(),
+				AddModifyEmailAddressActivity.class);
+
+		assertEquals(selectedApp, String.valueOf(solo.getButton(1).getText()));
 	}
 
 	public void testModifiedEmail() {
