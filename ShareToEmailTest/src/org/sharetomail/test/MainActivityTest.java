@@ -34,6 +34,8 @@ public class MainActivityTest extends
 
 	private Solo solo;
 	private String defaultEmail = "default.text@mail.org";
+	private String defaultEmailConfigLine = "{\"EMAIL_APP_PACKAGE_NAME\":\"\",\"EMAIL_APP_NAME\":\"\",\"EMAIL_ADDRESS\":\""
+			+ defaultEmail + "\"}";
 
 	public MainActivityTest() {
 		super(MainActivity.class);
@@ -72,7 +74,7 @@ public class MainActivityTest extends
 		Editor editor = sharedPreferences.edit();
 
 		editor.putString(Constants.EMAIL_ADDRESSES_SHARED_PREFERENCES_KEY,
-				defaultEmail);
+				defaultEmailConfigLine);
 
 		editor.commit();
 	}
@@ -195,9 +197,10 @@ public class MainActivityTest extends
 
 		solo.waitForActivity(MainActivity.class, 10000);
 
-		assertEquals(testModifiedEmail, ((ListView) solo.getCurrentActivity()
-				.findViewById(org.sharetomail.R.id.emailAddressesListView))
-				.getAdapter().getItem(0));
+		assertEquals(testModifiedEmail, String.valueOf(((ListView) solo
+				.getCurrentActivity().findViewById(
+						org.sharetomail.R.id.emailAddressesListView))
+				.getAdapter().getItem(0)));
 	}
 
 	public void testDeleteEmail() {
@@ -229,7 +232,7 @@ public class MainActivityTest extends
 				.getString(
 						org.sharetomail.R.string.set_as_default_email_address_menu_item));
 
-		assertEquals(defaultEmail, sharedPreferences.getString(
+		assertEquals(defaultEmailConfigLine, sharedPreferences.getString(
 				Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY, "N/A"));
 	}
 
@@ -252,8 +255,8 @@ public class MainActivityTest extends
 				.getString(
 						org.sharetomail.R.string.unset_as_default_email_address_menu_item));
 
-		assertEquals("", sharedPreferences.getString(
-				Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY, "N/A"));
+		assertFalse(sharedPreferences
+				.contains(Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY));
 	}
 
 	public void testOpenAbout() {
@@ -281,6 +284,7 @@ public class MainActivityTest extends
 		solo.clickOnCheckBox(0);
 
 		solo.goBack();
+		solo.goBack();
 
 		assertFalse(sharedPreferences
 				.getBoolean(
@@ -291,6 +295,7 @@ public class MainActivityTest extends
 
 		solo.clickOnCheckBox(0);
 
+		solo.goBack();
 		solo.goBack();
 
 		assertTrue(sharedPreferences
@@ -320,7 +325,7 @@ public class MainActivityTest extends
 
 		editor.putString(
 				Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
-				defaultEmail);
+				defaultEmailConfigLine);
 		editor.putString(Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY,
 				Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY);
 		editor.putBoolean(

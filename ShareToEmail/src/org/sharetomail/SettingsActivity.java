@@ -147,5 +147,4 @@ public class SettingsActivity extends Activity implements OnClickListener {
 					Toast.LENGTH_LONG).show();
 		}
 	}
-
 }

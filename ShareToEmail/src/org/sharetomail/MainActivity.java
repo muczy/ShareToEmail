@@ -260,7 +260,7 @@ public class MainActivity extends Activity {
 			// Change the context menu item "Set as default" to
 			// "Unset as default" for the default selected list item.
 			if (((TextView) info.targetView).getText().toString()
-					.equals(config.getDefaultEmailAddress())) {
+					.equals(config.getDefaultEmailAddress().getEmailAddress())) {
 				menu.findItem(R.id.setAsDefaultEmailAddressItem).setVisible(
 						false);
 				menu.findItem(R.id.unsetAsDefaultEmailAddressItem).setVisible(
