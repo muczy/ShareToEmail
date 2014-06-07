@@ -29,7 +29,6 @@ import android.support.v4.app.NavUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.util.Patterns;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -91,13 +90,9 @@ public class AddModifyEmailAddressActivity extends Activity {
 			public void onClick(View v) {
 				// Check if the input is in email address format. If it is not
 				// warn the user.
-				// NOTE: The default Android Patterns.EMAIL_ADDRESS does not
-				// seems to be handling user@host (host without TLD) so we try
-				// to workaround this here by appending a ".com" string.
 				String inputText = emailAddressTextView.getText().toString()
 						.trim();
-				if (isInEmailFormat(inputText)
-						|| isInEmailFormat(inputText + ".com")) {
+				if (Util.isInEmailFormat(inputText)) {
 					EmailAddress emailAddress = new EmailAddress(inputText,
 							emailAppName, emailAppPackageName);
 
@@ -134,10 +129,6 @@ public class AddModifyEmailAddressActivity extends Activity {
 							getString(R.string.dialog_input_is_not_in_email_format),
 							Toast.LENGTH_LONG).show();
 				}
-			}
-
-			private boolean isInEmailFormat(String text) {
-				return Patterns.EMAIL_ADDRESS.matcher(text).matches();
 			}
 		});
 

@@ -32,8 +32,14 @@ public class Configuration {
 				try {
 					result.add(new EmailAddress(rawEmailAddresses[i]));
 				} catch (ParseException e) {
-					Log.e(TAG, "Failed to parse line \"" + rawEmailAddresses[i]
-							+ "\" ==> skipping!");
+					if (Util.isInEmailFormat(rawEmailAddresses[i])) {
+						EmailAddress convertedEmailAddress = new EmailAddress(
+								rawEmailAddresses[i], "", "");
+						result.add(convertedEmailAddress);
+					} else {
+						Log.e(TAG, "Failed to parse line \""
+								+ rawEmailAddresses[i] + "\" ==> skipping!");
+					}
 				}
 			}
 		}

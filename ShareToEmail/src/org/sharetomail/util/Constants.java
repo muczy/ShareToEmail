@@ -45,4 +45,6 @@ public class Constants {
 			.toString();
 
 	public static final String CONFIGURATION_BACKUP_FILE = "sharetoemail-backup.properties";
+
+	public static final String EMAIL_HOSTNAME_TLD = ".com";
 }
