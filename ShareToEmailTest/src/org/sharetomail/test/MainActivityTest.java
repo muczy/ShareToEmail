@@ -206,10 +206,10 @@ public class MainActivityTest extends
 						org.sharetomail.R.id.emailAppTitleTextView)).getText());
 
 		solo.clickOnView(emailAppListView.getChildAt(selectedAppPosition));
-		
+
 		solo.waitForActivity(AddModifyEmailAddressActivity.class, 10000);
-		
-		assertEquals(selectedApp, String.valueOf(solo.getButton(0).getText()));
+
+		assertNotNull(solo.getButton(selectedApp));
 
 		// Save the test email address.
 		solo.clickOnButton(solo.getCurrentActivity().getString(
@@ -231,7 +231,7 @@ public class MainActivityTest extends
 				+ AddModifyEmailAddressActivity.class.getName(),
 				AddModifyEmailAddressActivity.class);
 
-		assertEquals(selectedApp, String.valueOf(solo.getButton(0).getText()));
+		assertNotNull(solo.getButton(selectedApp));
 	}
 
 	public void testModifiedEmail() {

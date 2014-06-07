@@ -42,5 +42,6 @@
     <string name="subject_prefix_setting_text">Email subject prefix:</string>
     <string name="email_app_image_content_description">Email application icon</string>
     <string name="app_selector">Application selector</string>
+    <string name="email_app_selector_button_label">Email application for this email address</string>
 
 </resources>
