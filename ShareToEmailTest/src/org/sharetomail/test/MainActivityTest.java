@@ -25,6 +25,7 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.robotium.solo.Solo;
 
@@ -169,7 +170,8 @@ public class MainActivityTest extends
 						1, 1000));
 	}
 
-	public void testAddNewEmail_WithSpecificEmailApp() {
+	public void testAddNewEmail_WithSpecificEmailApp()
+			throws InterruptedException {
 		// Add test email address.
 		solo.clickOnButton(solo.getCurrentActivity().getString(
 				org.sharetomail.R.string.add_email_address_button));
@@ -191,15 +193,23 @@ public class MainActivityTest extends
 		ListView emailAppListView = (ListView) solo.getCurrentActivity()
 				.findViewById(org.sharetomail.R.id.emailAppListView);
 
+		// Some delay is needed for the list to be populated.
+		Thread.sleep(1000);
+
 		if (emailAppListView.getChildCount() < 2) {
 			fail("No email apps were found. Please install at least one!");
 		}
 
 		int selectedAppPosition = 1;
-		String selectedApp = String.valueOf(emailAppListView.getAdapter()
-				.getItem(selectedAppPosition));
+		String selectedApp = String.valueOf(((TextView) emailAppListView
+				.getChildAt(selectedAppPosition).findViewById(
+						org.sharetomail.R.id.emailAppTitleTextView)).getText());
+
 		solo.clickOnView(emailAppListView.getChildAt(selectedAppPosition));
+		
 		solo.waitForActivity(AddModifyEmailAddressActivity.class, 10000);
+		
+		assertEquals(selectedApp, String.valueOf(solo.getButton(0).getText()));
 
 		// Save the test email address.
 		solo.clickOnButton(solo.getCurrentActivity().getString(
@@ -221,7 +231,7 @@ public class MainActivityTest extends
 				+ AddModifyEmailAddressActivity.class.getName(),
 				AddModifyEmailAddressActivity.class);
 
-		assertEquals(selectedApp, String.valueOf(solo.getButton(1).getText()));
+		assertEquals(selectedApp, String.valueOf(solo.getButton(0).getText()));
 	}
 
 	public void testModifiedEmail() {
