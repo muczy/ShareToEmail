@@ -24,9 +24,28 @@
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/emailAddressEditText"
+        android:layout_below="@+id/emailAppButton"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="61dp"
         android:enabled="false"
         android:text="@string/add_email_address_button" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/emailAddressEditText"
+        android:layout_below="@+id/emailAddressEditText"
+        android:layout_marginTop="45dp"
+        android:text="@string/email_app_selector_button_label"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <Button
+        android:id="@+id/emailAppButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView1"
+        android:layout_centerHorizontal="true"
+        android:text="@string/app_selector" />
 
 </RelativeLayout>

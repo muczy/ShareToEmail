@@ -17,16 +17,18 @@ package org.sharetomail;
 
 import org.sharetomail.util.Configuration;
 import org.sharetomail.util.Constants;
+import org.sharetomail.util.EmailAddress;
+import org.sharetomail.util.Util;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Patterns;
-import android.view.Menu;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -36,8 +38,14 @@ import android.widget.Toast;
 
 public class AddModifyEmailAddressActivity extends Activity {
 
+	protected static final String TAG = AddModifyEmailAddressActivity.class
+			.getName();
+
 	private Configuration config;
-	private String origEmail = null;
+	private EmailAddress origEmail;
+	private String emailAppName = "";
+	private String emailAppPackageName = "";
+	private Button emailAppButton;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +59,7 @@ public class AddModifyEmailAddressActivity extends Activity {
 
 		final Button addModifyEmailAddressButton = (Button) findViewById(R.id.addModifyEmailAddressButton);
 		final TextView emailAddressTextView = (TextView) findViewById(R.id.emailAddressEditText);
+		emailAppButton = (Button) findViewById(R.id.emailAppButton);
 
 		// Custom text change listener to enable/disable the add/modify email
 		// address button when the input text changes.
@@ -81,13 +90,12 @@ public class AddModifyEmailAddressActivity extends Activity {
 			public void onClick(View v) {
 				// Check if the input is in email address format. If it is not
 				// warn the user.
-				// NOTE: The default Android Patterns.EMAIL_ADDRESS does not
-				// seems to be handling user@host (host without TLD) so we try
-				// to workaround this here by appending a ".com" string.
 				String inputText = emailAddressTextView.getText().toString()
 						.trim();
-				if (isInEmailFormat(inputText)
-						|| isInEmailFormat(inputText + ".com")) {
+				if (Util.isInEmailFormat(inputText)) {
+					EmailAddress emailAddress = new EmailAddress(inputText,
+							emailAppName, emailAppPackageName);
+
 					if (origEmail != null) {
 						int position = -1;
 						for (int i = 0; i < config.getEmailAddresses().size(); i++) {
@@ -101,12 +109,16 @@ public class AddModifyEmailAddressActivity extends Activity {
 						// Original email address was not found (somebody
 						// removed it in the mean time?) so we add it.
 						if (position < 0) {
-							config.addEmailAddress(inputText);
+							Log.w(TAG,
+									"Email address \""
+											+ origEmail.getEmailAddress()
+											+ "\" was not found which is bad. Adding it.");
+							config.addEmailAddress(emailAddress);
+						} else {
+							config.setEmailAddress(position, emailAddress);
 						}
-
-						config.setEmailAddress(position, inputText);
 					} else {
-						config.addEmailAddress(inputText);
+						config.addEmailAddress(emailAddress);
 					}
 
 					setResult(Activity.RESULT_OK, getIntent());
@@ -118,22 +130,39 @@ public class AddModifyEmailAddressActivity extends Activity {
 							Toast.LENGTH_LONG).show();
 				}
 			}
+		});
 
-			private boolean isInEmailFormat(String text) {
-				return Patterns.EMAIL_ADDRESS.matcher(text).matches();
+		emailAppButton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				startEmailAppSelector();
 			}
 		});
 
 		// If we get the email address in the intent then we modify it so fill
 		// the TextView and rename labels.
 		if (getIntent().hasExtra(Constants.ORIG_EMAIL_ADDRESS_INTENT_KEY)) {
+			origEmail = getIntent().getParcelableExtra(
+					Constants.ORIG_EMAIL_ADDRESS_INTENT_KEY);
+
+			emailAppName = origEmail.getEmailAppName();
+			emailAppPackageName = origEmail.getEmailAppPackageName();
+
 			setTitle(R.string.title_activity_modify_email_address);
 			addModifyEmailAddressButton
 					.setText(R.string.modify_email_address_button);
-			origEmail = getIntent().getStringExtra(
-					Constants.ORIG_EMAIL_ADDRESS_INTENT_KEY);
-			emailAddressTextView.setText(origEmail);
+			emailAddressTextView.setText(origEmail.getEmailAddress());
+
+			setEmailAppButtonText();
 		}
+	}
+
+	protected void startEmailAppSelector() {
+		Intent emailAppSelectorActivity = new Intent(this,
+				EmailAppSelectorActivity.class);
+		startActivityForResult(emailAppSelectorActivity,
+				Constants.EMAIL_APP_SELECTOR_ACTIVITY_REQUEST_CODE);
 	}
 
 	/**
@@ -144,13 +173,6 @@ public class AddModifyEmailAddressActivity extends Activity {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 			getActionBar().setDisplayHomeAsUpEnabled(true);
 		}
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.add_email_address, menu);
-		return true;
 	}
 
 	@Override
@@ -168,6 +190,32 @@ public class AddModifyEmailAddressActivity extends Activity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode == Constants.EMAIL_APP_SELECTOR_ACTIVITY_REQUEST_CODE) {
+			emailAppName = data
+					.getStringExtra(Constants.EMAIL_APP_NAME_INTENT_KEY);
+			emailAppPackageName = data
+					.getStringExtra(Constants.EMAIL_APP_PACKAGE_NAME_INTENT_KEY);
+
+			setEmailAppButtonText();
+		}
+	}
+
+	private void setEmailAppButtonText() {
+		CharSequence emailAppLabel = Util.getEmailAppLabel(emailAppPackageName,
+				getPackageManager());
+
+		// The originally selected app might got changed or uninstalled.
+		if (emailAppLabel == null || emailAppLabel.length() == 0) {
+			emailAppName = "";
+			emailAppPackageName = "";
+			emailAppLabel = getString(R.string.app_selector);
+		}
+
+		emailAppButton.setText(emailAppLabel);
 	}
 
 }

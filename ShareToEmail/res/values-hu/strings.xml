@@ -6,11 +6,14 @@
     <!-- Dialog strings -->
     <string name="dialog_input_is_not_in_email_format">A megadott érték nem e-mail formátumú!</string>
     <string name="send_email">E-mail küldése</string>
+    <string name="email_app_not_found">Az eredetileg kiválasztott e-mail program nem található. Talán megváltozott, vagy törlésre került. Kérem ellenőrizze az e-mail cím beállításait! Kívánja most módosítani őket?</string>
+    <string name="modify_button">Módosítás</string>
     <!-- Title strings -->
     <string name="app_name">Share to Email</string>
     <string name="title_activity_add_email_address">E-mail cím hozzáadása</string>
     <string name="title_activity_modify_email_address">E-mail cím módosítása</string>
     <string name="title_activity_settings">Beállítások</string>
+    <string name="title_activity_email_app_selector">E-mail program választás</string>
     <!-- Other strings -->
     <string name="action_settings">Beállítások</string>
         <string name="action_about">Névjegy</string>
@@ -35,5 +38,8 @@
     <string name="error_while_loading_backup">Hiba a mentés betöltésekor: %1$s</string>
     <string name="backup_file_created">A mentésfájl elkészült itt: %1$s</string>
     <string name="backup_file_loaded">A konfiguráció visszatöltésre került a mentésfájlból!</string>
+    <string name="email_app_image_content_description">Email program ikon</string>
+    <string name="app_selector">Alkalmazás választó</string>
+    <string name="email_app_selector_button_label">E-mail program ehhez az e-mail címhez</string>
 
 </resources>

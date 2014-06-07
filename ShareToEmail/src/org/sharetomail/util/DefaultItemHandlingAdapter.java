@@ -31,7 +31,7 @@ public class DefaultItemHandlingAdapter<T> extends BaseAdapter {
 	}
 
 	@Override
-	public Object getItem(int position) {
+	public T getItem(int position) {
 		return objects.get(position);
 	}
 
@@ -54,17 +54,17 @@ public class DefaultItemHandlingAdapter<T> extends BaseAdapter {
 		TextView defaultItemHandlingTextView = (TextView) rowView
 				.findViewById(android.R.id.text1);
 
+		String itemString = String.valueOf(objects.get(position));
+
 		// Make the default item bold.
-		if (defaultItem.equals(objects.get(position))) {
-			SpannableString spannableString = new SpannableString(
-					String.valueOf(objects.get(position)));
+		if (objects.get(position).equals(defaultItem)) {
+			SpannableString spannableString = new SpannableString(itemString);
 			spannableString.setSpan(new StyleSpan(Typeface.BOLD), 0,
 					spannableString.length(), 0);
 			defaultItemHandlingTextView.setText(spannableString,
 					TextView.BufferType.SPANNABLE);
 		} else {
-			defaultItemHandlingTextView.setText(String.valueOf(objects
-					.get(position)));
+			defaultItemHandlingTextView.setText(itemString);
 		}
 
 		return rowView;

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.sharetomail.AddModifyEmailAddressActivity;
+import org.sharetomail.EmailAppSelectorActivity;
 import org.sharetomail.MainActivity;
 import org.sharetomail.SettingsActivity;
 import org.sharetomail.util.Configuration;
@@ -24,6 +25,8 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
+
 import com.robotium.solo.Solo;
 
 public class MainActivityTest extends
@@ -33,6 +36,8 @@ public class MainActivityTest extends
 
 	private Solo solo;
 	private String defaultEmail = "default.text@mail.org";
+	private String defaultEmailConfigLine = "{\"EMAIL_APP_PACKAGE_NAME\":\"\",\"EMAIL_APP_NAME\":\"\",\"EMAIL_ADDRESS\":\""
+			+ defaultEmail + "\"}";
 
 	public MainActivityTest() {
 		super(MainActivity.class);
@@ -71,7 +76,7 @@ public class MainActivityTest extends
 		Editor editor = sharedPreferences.edit();
 
 		editor.putString(Constants.EMAIL_ADDRESSES_SHARED_PREFERENCES_KEY,
-				defaultEmail);
+				defaultEmailConfigLine);
 
 		editor.commit();
 	}
@@ -107,7 +112,8 @@ public class MainActivityTest extends
 				.findViewById(org.sharetomail.R.id.emailAddressesListView))
 				.getAdapter();
 
-		assertEquals(testEmail, adapter.getItem(adapter.getCount() - 1));
+		assertEquals(testEmail,
+				String.valueOf(adapter.getItem(adapter.getCount() - 1)));
 	}
 
 	public void testAddNewEmail_ValidEmailWithoutTLD() {
@@ -132,7 +138,8 @@ public class MainActivityTest extends
 				.findViewById(org.sharetomail.R.id.emailAddressesListView))
 				.getAdapter();
 
-		assertEquals(testEmail, adapter.getItem(adapter.getCount() - 1));
+		assertEquals(testEmail,
+				String.valueOf(adapter.getItem(adapter.getCount() - 1)));
 	}
 
 	public void testAddNewEmail_InvalidEmail() {
@@ -161,6 +168,70 @@ public class MainActivityTest extends
 								.getString(
 										org.sharetomail.R.string.dialog_input_is_not_in_email_format),
 						1, 1000));
+	}
+
+	public void testAddNewEmail_WithSpecificEmailApp()
+			throws InterruptedException {
+		// Add test email address.
+		solo.clickOnButton(solo.getCurrentActivity().getString(
+				org.sharetomail.R.string.add_email_address_button));
+
+		solo.waitForActivity(AddModifyEmailAddressActivity.class, 10000);
+
+		String testEmail = "test@example.org";
+
+		solo.enterText(
+				(EditText) solo.getCurrentActivity().findViewById(
+						org.sharetomail.R.id.emailAddressEditText), testEmail);
+
+		// Set an email app for the test email address.
+		solo.clickOnButton(solo.getCurrentActivity().getString(
+				org.sharetomail.R.string.app_selector));
+
+		solo.waitForActivity(EmailAppSelectorActivity.class, 10000);
+
+		ListView emailAppListView = (ListView) solo.getCurrentActivity()
+				.findViewById(org.sharetomail.R.id.emailAppListView);
+
+		// Some delay is needed for the list to be populated.
+		Thread.sleep(1000);
+
+		if (emailAppListView.getChildCount() < 2) {
+			fail("No email apps were found. Please install at least one!");
+		}
+
+		int selectedAppPosition = 1;
+		String selectedApp = String.valueOf(((TextView) emailAppListView
+				.getChildAt(selectedAppPosition).findViewById(
+						org.sharetomail.R.id.emailAppTitleTextView)).getText());
+
+		solo.clickOnView(emailAppListView.getChildAt(selectedAppPosition));
+
+		solo.waitForActivity(AddModifyEmailAddressActivity.class, 10000);
+
+		assertNotNull(solo.getButton(selectedApp));
+
+		// Save the test email address.
+		solo.clickOnButton(solo.getCurrentActivity().getString(
+				org.sharetomail.R.string.add_email_address_button));
+
+		solo.assertCurrentActivity("Current activity is not "
+				+ MainActivity.class.getName(), MainActivity.class);
+
+		// Open email address modification activity and verify email app.
+		ListView addressListView = (ListView) solo.getCurrentActivity()
+				.findViewById(org.sharetomail.R.id.emailAddressesListView);
+		solo.clickLongOnView(addressListView.getChildAt(addressListView
+				.getAdapter().getCount() - 1));
+
+		solo.clickOnText(solo.getCurrentActivity().getString(
+				org.sharetomail.R.string.modify_email_address_menu_item));
+
+		solo.assertCurrentActivity("Current activity is not "
+				+ AddModifyEmailAddressActivity.class.getName(),
+				AddModifyEmailAddressActivity.class);
+
+		assertNotNull(solo.getButton(selectedApp));
 	}
 
 	public void testModifiedEmail() {
@@ -192,9 +263,10 @@ public class MainActivityTest extends
 
 		solo.waitForActivity(MainActivity.class, 10000);
 
-		assertEquals(testModifiedEmail, ((ListView) solo.getCurrentActivity()
-				.findViewById(org.sharetomail.R.id.emailAddressesListView))
-				.getAdapter().getItem(0));
+		assertEquals(testModifiedEmail, String.valueOf(((ListView) solo
+				.getCurrentActivity().findViewById(
+						org.sharetomail.R.id.emailAddressesListView))
+				.getAdapter().getItem(0)));
 	}
 
 	public void testDeleteEmail() {
@@ -226,7 +298,7 @@ public class MainActivityTest extends
 				.getString(
 						org.sharetomail.R.string.set_as_default_email_address_menu_item));
 
-		assertEquals(defaultEmail, sharedPreferences.getString(
+		assertEquals(defaultEmailConfigLine, sharedPreferences.getString(
 				Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY, "N/A"));
 	}
 
@@ -249,8 +321,8 @@ public class MainActivityTest extends
 				.getString(
 						org.sharetomail.R.string.unset_as_default_email_address_menu_item));
 
-		assertEquals("", sharedPreferences.getString(
-				Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY, "N/A"));
+		assertFalse(sharedPreferences
+				.contains(Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY));
 	}
 
 	public void testOpenAbout() {
@@ -278,6 +350,7 @@ public class MainActivityTest extends
 		solo.clickOnCheckBox(0);
 
 		solo.goBack();
+		solo.goBack();
 
 		assertFalse(sharedPreferences
 				.getBoolean(
@@ -288,6 +361,7 @@ public class MainActivityTest extends
 
 		solo.clickOnCheckBox(0);
 
+		solo.goBack();
 		solo.goBack();
 
 		assertTrue(sharedPreferences
@@ -317,7 +391,7 @@ public class MainActivityTest extends
 
 		editor.putString(
 				Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
-				defaultEmail);
+				defaultEmailConfigLine);
 		editor.putString(Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY,
 				Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY);
 		editor.putBoolean(
