@@ -6,6 +6,7 @@ package org.sharetomail.test;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -22,6 +23,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Environment;
 import android.test.ActivityInstrumentationTestCase2;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -64,6 +66,12 @@ public class MainActivityTest extends
 		if (myKM.inKeyguardRestrictedInputMode()) {
 			fail("Screen is locked! Please open it!");
 		}
+	}
+
+	@Override
+	public void tearDown() throws Exception {
+		solo.finishOpenedActivities();
+		clearSharedPreferences();
 	}
 
 	private void clearSharedPreferences() {
@@ -426,10 +434,55 @@ public class MainActivityTest extends
 		assertEquals(propsFromConfig, props);
 	}
 
-	@Override
-	public void tearDown() throws Exception {
-		solo.finishOpenedActivities();
-		clearSharedPreferences();
-	}
+	public void testSettings_Restore() throws IOException {
+		File backupFile = new File(
+				Environment
+						.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+				Constants.CONFIGURATION_BACKUP_FILE);
 
+		Properties props = new Properties();
+
+		props.put(Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
+				defaultEmail);
+		String testEmailSubjectPrefix = "testEmailSubjectPrefix";
+		props.put(Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY,
+				testEmailSubjectPrefix);
+		boolean testUseDefaultEmail = true;
+		props.put(
+				Constants.AUTO_USE_DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
+				Boolean.toString(testUseDefaultEmail));
+
+		props.store(new FileWriter(backupFile, false), "");
+
+		solo.waitForActivity(MainActivity.class, 2000);
+
+		assertEquals(
+				defaultEmail,
+				((TextView) ((ListView) solo.getCurrentActivity().findViewById(
+						org.sharetomail.R.id.emailAddressesListView))
+						.getChildAt(0)).getText().toString());
+
+		openSettings();
+
+		solo.clickOnButton(solo.getCurrentActivity().getString(
+				org.sharetomail.R.string.restore_config_button));
+
+		solo.goBack();
+		solo.goBack();
+
+		openSettings();
+
+		assertEquals(
+				testEmailSubjectPrefix,
+				((EditText) solo.getCurrentActivity().findViewById(
+						org.sharetomail.R.id.emailSubjectPrefixEditText))
+						.getText().toString());
+		assertEquals(
+				testUseDefaultEmail,
+				((CheckBox) solo
+						.getCurrentActivity()
+						.findViewById(
+								org.sharetomail.R.id.autoUseDefaultEmailAddressCheckBox))
+						.isChecked());
+	}
 }
