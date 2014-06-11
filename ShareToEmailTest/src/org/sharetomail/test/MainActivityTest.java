@@ -229,6 +229,7 @@ public class MainActivityTest extends
 		// Open email address modification activity and verify email app.
 		ListView addressListView = (ListView) solo.getCurrentActivity()
 				.findViewById(org.sharetomail.R.id.emailAddressesListView);
+		Thread.sleep(500);
 		solo.clickLongOnView(addressListView.getChildAt(addressListView
 				.getAdapter().getCount() - 1));
 
@@ -297,7 +298,7 @@ public class MainActivityTest extends
 						.getAdapter().getCount());
 	}
 
-	public void testSetDefaultEmail() {
+	public void testSetDefaultEmail() throws InterruptedException {
 		solo.clickLongOnView(((ListView) solo.getCurrentActivity()
 				.findViewById(org.sharetomail.R.id.emailAddressesListView))
 				.getChildAt(0));
@@ -306,11 +307,13 @@ public class MainActivityTest extends
 				.getString(
 						org.sharetomail.R.string.set_as_default_email_address_menu_item));
 
+		Thread.sleep(500);
+
 		assertEquals(defaultEmailConfigLine, sharedPreferences.getString(
 				Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY, "N/A"));
 	}
 
-	public void testUnsetDefaultEmail() {
+	public void testUnsetDefaultEmail() throws InterruptedException {
 		solo.clickLongOnView(((ListView) solo.getCurrentActivity()
 				.findViewById(org.sharetomail.R.id.emailAddressesListView))
 				.getChildAt(0));
@@ -329,6 +332,7 @@ public class MainActivityTest extends
 				.getString(
 						org.sharetomail.R.string.unset_as_default_email_address_menu_item));
 
+		Thread.sleep(500);
 		assertFalse(sharedPreferences
 				.contains(Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY));
 	}
@@ -358,7 +362,6 @@ public class MainActivityTest extends
 		solo.clickOnCheckBox(0);
 
 		solo.goBack();
-		solo.goBack();
 
 		assertFalse(sharedPreferences
 				.getBoolean(
@@ -369,7 +372,6 @@ public class MainActivityTest extends
 
 		solo.clickOnCheckBox(0);
 
-		solo.goBack();
 		solo.goBack();
 
 		assertTrue(sharedPreferences
@@ -394,7 +396,7 @@ public class MainActivityTest extends
 				Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY, ""));
 	}
 
-	public void testSettings_Backup() {
+	public void testSettings_Backup() throws InterruptedException {
 		Editor editor = sharedPreferences.edit();
 
 		editor.putString(
@@ -431,6 +433,7 @@ public class MainActivityTest extends
 		Properties propsFromConfig = new Configuration(sharedPreferences)
 				.toProperties();
 
+		Thread.sleep(500);
 		assertEquals(propsFromConfig, props);
 	}
 
@@ -467,7 +470,6 @@ public class MainActivityTest extends
 		solo.clickOnButton(solo.getCurrentActivity().getString(
 				org.sharetomail.R.string.restore_config_button));
 
-		solo.goBack();
 		solo.goBack();
 
 		openSettings();
