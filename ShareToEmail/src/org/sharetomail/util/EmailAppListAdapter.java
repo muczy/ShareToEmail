@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 public class EmailAppListAdapter extends BaseAdapter {
+
+	private static final String TAG = EmailAppListAdapter.class.getName();
 
 	private Context context;
 
@@ -77,7 +80,13 @@ public class EmailAppListAdapter extends BaseAdapter {
 			emailAppImageView.setImageDrawable(emailApps.get(position)
 					.loadIcon(packageManager));
 		} catch (IllegalStateException e) {
-			// TODO: handle? empty app icon?
+			Log.e(TAG,
+					"IllegalStateException while loading icon for email app!",
+					e);
+		} catch (NullPointerException e) {
+			// Possible LG P880 - Android 4.0.3 related bug from user Darkcomet.
+			Log.e(TAG,
+					"NullPointerException while loading icon for email app!", e);
 		}
 
 		CharSequence appLabel;
