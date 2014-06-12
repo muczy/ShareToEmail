@@ -72,6 +72,8 @@ public class MainActivityTest extends
 	public void tearDown() throws Exception {
 		solo.finishOpenedActivities();
 		clearSharedPreferences();
+
+		super.tearDown();
 	}
 
 	private void clearSharedPreferences() {
@@ -413,6 +415,7 @@ public class MainActivityTest extends
 				org.sharetomail.R.string.backup_config_button));
 
 		File backupFile = new File(ConfigurationBackupAgent.getBackupFileName());
+		assertTrue(backupFile.exists());
 		assertTrue(backupFile.canRead());
 
 		Properties props = new Properties();
@@ -427,7 +430,7 @@ public class MainActivityTest extends
 		Properties propsFromConfig = new Configuration(sharedPreferences)
 				.toProperties();
 
-		Thread.sleep(1000);
+		Thread.sleep(2000);
 		assertEquals(propsFromConfig, props);
 	}
 
