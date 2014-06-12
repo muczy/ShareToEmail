@@ -9,8 +9,8 @@ public class BackupException extends Exception {
 	private int resourceId;
 	private String value;
 
-	public BackupException(int resourceId, String value) {
-		super();
+	public BackupException(int resourceId, String value, Throwable throwable) {
+		super(throwable);
 		this.resourceId = resourceId;
 		this.value = value;
 	}

@@ -76,23 +76,21 @@ public class EmailAppListAdapter extends BaseAdapter {
 		TextView emailAppTitleTextView = (TextView) rowView
 				.findViewById(R.id.emailAppTitleTextView);
 
-		try {
-			emailAppImageView.setImageDrawable(emailApps.get(position)
-					.loadIcon(packageManager));
-		} catch (IllegalStateException e) {
-			Log.e(TAG,
-					"IllegalStateException while loading icon for email app!",
-					e);
-		} catch (NullPointerException e) {
-			// Possible LG P880 - Android 4.0.3 related bug from user Darkcomet.
-			Log.e(TAG,
-					"NullPointerException while loading icon for email app!", e);
+		if (position != 0) {
+			try {
+				emailAppImageView.setImageDrawable(emailApps.get(position)
+						.loadIcon(packageManager));
+			} catch (IllegalStateException e) {
+				Log.e(TAG,
+						"IllegalStateException while loading icon for email app!",
+						e);
+			}
 		}
 
 		CharSequence appLabel;
-		try {
+		if (position != 0) {
 			appLabel = emailApps.get(position).loadLabel(packageManager);
-		} catch (IllegalStateException e) {
+		} else {
 			appLabel = context.getString(R.string.app_selector);
 		}
 

@@ -16,7 +16,8 @@ import android.os.Environment;
 public class ConfigurationBackupAgent {
 	public static void onBackup(Configuration config) throws BackupException {
 		if (!isExternalStorageWriteable()) {
-			throw new BackupException(R.string.ext_storage_not_writable, null);
+			throw new BackupException(R.string.ext_storage_not_writable, null,
+					null);
 		}
 
 		File backupFile = getBackupFile();
@@ -27,13 +28,14 @@ public class ConfigurationBackupAgent {
 			props.store(new FileWriter(backupFile), "Backup creation date:");
 		} catch (IOException e) {
 			throw new BackupException(R.string.error_while_loading_backup,
-					backupFile.getAbsolutePath());
+					backupFile.getAbsolutePath(), e);
 		}
 	}
 
 	public static void onRestore(Configuration config) throws BackupException {
 		if (!isExternalStorageWriteable() && !isExternalStorageReadable()) {
-			throw new BackupException(R.string.ext_storage_not_readable, null);
+			throw new BackupException(R.string.ext_storage_not_readable, null,
+					null);
 		}
 
 		File backupFile = getBackupFile();
@@ -43,10 +45,10 @@ public class ConfigurationBackupAgent {
 			props.load(new FileReader(backupFile));
 		} catch (FileNotFoundException e) {
 			throw new BackupException(R.string.backup_file_not_be_found,
-					backupFile.getAbsolutePath());
+					backupFile.getAbsolutePath(), e);
 		} catch (IOException e) {
 			throw new BackupException(R.string.error_while_loading_backup,
-					e.getLocalizedMessage());
+					e.getLocalizedMessage(), e);
 		}
 
 		config.loadProperties(props);
@@ -73,9 +75,13 @@ public class ConfigurationBackupAgent {
 	}
 
 	private static File getBackupFile() {
-		return new File(
-				Environment
-						.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+		File externalStoragePublicDirectory = Environment
+				.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+		if (!externalStoragePublicDirectory.exists()) {
+			externalStoragePublicDirectory.mkdirs();
+		}
+
+		return new File(externalStoragePublicDirectory,
 				Constants.CONFIGURATION_BACKUP_FILE);
 	}
 }
