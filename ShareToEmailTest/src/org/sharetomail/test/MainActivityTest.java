@@ -62,6 +62,11 @@ public class MainActivityTest extends
 
 		solo = new Solo(getInstrumentation(), getActivity());
 
+		File backupFile = new File(ConfigurationBackupAgent.getBackupFileName());
+		if (backupFile.exists()) {
+			backupFile.delete();
+		}
+
 		KeyguardManager myKM = (KeyguardManager) getActivity()
 				.getSystemService(Context.KEYGUARD_SERVICE);
 		if (myKM.inKeyguardRestrictedInputMode()) {
@@ -397,6 +402,7 @@ public class MainActivityTest extends
 				org.sharetomail.R.string.backup_config_button));
 
 		File backupFile = new File(ConfigurationBackupAgent.getBackupFileName());
+		Thread.sleep(2000);
 		assertTrue(backupFile.exists());
 		assertTrue(backupFile.canRead());
 
@@ -412,7 +418,7 @@ public class MainActivityTest extends
 		Properties propsFromConfig = new Configuration(sharedPreferences)
 				.toProperties();
 
-		Thread.sleep(2000);
+		Thread.sleep(10000);
 		assertEquals(propsFromConfig, props);
 	}
 
@@ -467,6 +473,7 @@ public class MainActivityTest extends
 	}
 
 	private ListView getEmailAddressesListView() {
+		solo.waitForView(org.sharetomail.R.id.emailAddressesListView, 1, 2000);
 		return (ListView) findViewById(org.sharetomail.R.id.emailAddressesListView);
 	}
 }
