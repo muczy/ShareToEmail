@@ -12,7 +12,6 @@ public class Util {
 			return packageManager.getApplicationInfo(appPackageName, 0)
 					.loadLabel(packageManager);
 		} catch (NameNotFoundException e) {
-			// TODO: handle better?
 			return "";
 		}
 	}

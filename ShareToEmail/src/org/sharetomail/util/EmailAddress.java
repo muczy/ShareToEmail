@@ -2,11 +2,13 @@ package org.sharetomail.util;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 public class EmailAddress implements Parcelable {
+
+	private static final String TAG = EmailAddress.class.getName();
 
 	private String emailAddress = "";
 	private String emailAppName = "";
@@ -67,6 +69,7 @@ public class EmailAddress implements Parcelable {
 
 	public String toConfigurationLine() {
 		JSONObject jsonObject = new JSONObject();
+
 		try {
 			jsonObject.put(Constants.EMAIL_ADDRESS_JSON_EMAIL_ADDRESS,
 					emailAddress);
@@ -75,8 +78,9 @@ public class EmailAddress implements Parcelable {
 			jsonObject.put(Constants.EMAIL_ADDRESS_JSON_EMAIL_APP_PACKAGE_NAME,
 					emailAppPackageName);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log.e(TAG,
+					"Recieved JSONException while creating JSON from EmailAddress!",
+					e);
 		}
 
 		return jsonObject.toString();
