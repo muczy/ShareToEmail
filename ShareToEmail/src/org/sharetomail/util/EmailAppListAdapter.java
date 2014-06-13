@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 public class EmailAppListAdapter extends BaseAdapter {
+
+	private static final String TAG = EmailAppListAdapter.class.getName();
 
 	private Context context;
 
@@ -73,17 +76,21 @@ public class EmailAppListAdapter extends BaseAdapter {
 		TextView emailAppTitleTextView = (TextView) rowView
 				.findViewById(R.id.emailAppTitleTextView);
 
-		try {
-			emailAppImageView.setImageDrawable(emailApps.get(position)
-					.loadIcon(packageManager));
-		} catch (IllegalStateException e) {
-			// TODO: handle? empty app icon?
+		if (position != 0) {
+			try {
+				emailAppImageView.setImageDrawable(emailApps.get(position)
+						.loadIcon(packageManager));
+			} catch (IllegalStateException e) {
+				Log.e(TAG,
+						"IllegalStateException while loading icon for email app!",
+						e);
+			}
 		}
 
 		CharSequence appLabel;
-		try {
+		if (position != 0) {
 			appLabel = emailApps.get(position).loadLabel(packageManager);
-		} catch (IllegalStateException e) {
+		} else {
 			appLabel = context.getString(R.string.app_selector);
 		}
 

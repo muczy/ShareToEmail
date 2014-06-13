@@ -175,8 +175,11 @@ public class Configuration {
 
 		properties.put(Constants.EMAIL_ADDRESSES_SHARED_PREFERENCES_KEY,
 				builder.toString());
-		properties.put(Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
-				getDefaultEmailAddress().toConfigurationLine());
+		if (!getDefaultEmailAddress().getEmailAddress().isEmpty()) {
+			properties.put(
+					Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
+					getDefaultEmailAddress().toConfigurationLine());
+		}
 		properties.put(Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY,
 				getEmailSubjectPrefix());
 		properties

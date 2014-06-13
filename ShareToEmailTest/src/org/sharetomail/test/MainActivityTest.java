@@ -16,12 +16,12 @@ import org.sharetomail.MainActivity;
 import org.sharetomail.SettingsActivity;
 import org.sharetomail.util.Configuration;
 import org.sharetomail.util.Constants;
+import org.sharetomail.util.backup.ConfigurationBackupAgent;
 
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.os.Environment;
 import android.test.ActivityInstrumentationTestCase2;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -72,6 +72,8 @@ public class MainActivityTest extends
 	public void tearDown() throws Exception {
 		solo.finishOpenedActivities();
 		clearSharedPreferences();
+
+		super.tearDown();
 	}
 
 	private void clearSharedPreferences() {
@@ -198,11 +200,12 @@ public class MainActivityTest extends
 
 		solo.waitForActivity(EmailAppSelectorActivity.class, 10000);
 
+		solo.waitForView(org.sharetomail.R.id.aboutAuthorTextView, 1, 1000);
 		ListView emailAppListView = (ListView) solo.getCurrentActivity()
 				.findViewById(org.sharetomail.R.id.emailAppListView);
 
 		// Some delay is needed for the list to be populated.
-		Thread.sleep(1000);
+		// Thread.sleep(500);
 
 		if (emailAppListView.getChildCount() < 2) {
 			fail("No email apps were found. Please install at least one!");
@@ -212,6 +215,12 @@ public class MainActivityTest extends
 		String selectedApp = String.valueOf(((TextView) emailAppListView
 				.getChildAt(selectedAppPosition).findViewById(
 						org.sharetomail.R.id.emailAppTitleTextView)).getText());
+
+		// On emulator there the default "Unsupported action" which has an
+		// alternative label "Fallback".
+		if (selectedApp.equals("Unsupported action")) {
+			selectedApp = "Fallback";
+		}
 
 		solo.clickOnView(emailAppListView.getChildAt(selectedAppPosition));
 
@@ -229,6 +238,7 @@ public class MainActivityTest extends
 		// Open email address modification activity and verify email app.
 		ListView addressListView = (ListView) solo.getCurrentActivity()
 				.findViewById(org.sharetomail.R.id.emailAddressesListView);
+		Thread.sleep(500);
 		solo.clickLongOnView(addressListView.getChildAt(addressListView
 				.getAdapter().getCount() - 1));
 
@@ -297,7 +307,7 @@ public class MainActivityTest extends
 						.getAdapter().getCount());
 	}
 
-	public void testSetDefaultEmail() {
+	public void testSetDefaultEmail() throws InterruptedException {
 		solo.clickLongOnView(((ListView) solo.getCurrentActivity()
 				.findViewById(org.sharetomail.R.id.emailAddressesListView))
 				.getChildAt(0));
@@ -306,11 +316,13 @@ public class MainActivityTest extends
 				.getString(
 						org.sharetomail.R.string.set_as_default_email_address_menu_item));
 
+		Thread.sleep(500);
+
 		assertEquals(defaultEmailConfigLine, sharedPreferences.getString(
 				Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY, "N/A"));
 	}
 
-	public void testUnsetDefaultEmail() {
+	public void testUnsetDefaultEmail() throws InterruptedException {
 		solo.clickLongOnView(((ListView) solo.getCurrentActivity()
 				.findViewById(org.sharetomail.R.id.emailAddressesListView))
 				.getChildAt(0));
@@ -329,6 +341,7 @@ public class MainActivityTest extends
 				.getString(
 						org.sharetomail.R.string.unset_as_default_email_address_menu_item));
 
+		Thread.sleep(500);
 		assertFalse(sharedPreferences
 				.contains(Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY));
 	}
@@ -358,7 +371,6 @@ public class MainActivityTest extends
 		solo.clickOnCheckBox(0);
 
 		solo.goBack();
-		solo.goBack();
 
 		assertFalse(sharedPreferences
 				.getBoolean(
@@ -369,7 +381,6 @@ public class MainActivityTest extends
 
 		solo.clickOnCheckBox(0);
 
-		solo.goBack();
 		solo.goBack();
 
 		assertTrue(sharedPreferences
@@ -394,29 +405,17 @@ public class MainActivityTest extends
 				Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY, ""));
 	}
 
-	public void testSettings_Backup() {
-		Editor editor = sharedPreferences.edit();
-
-		editor.putString(
-				Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
-				defaultEmailConfigLine);
-		editor.putString(Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY,
-				Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY);
-		editor.putBoolean(
-				Constants.AUTO_USE_DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
-				false);
-
-		editor.commit();
+	public void testSettings_Backup() throws InterruptedException {
+		assertTrue("External storage is not available! Please insert SDCARD!",
+				ConfigurationBackupAgent.isExternalStorageWriteable());
 
 		openSettings();
 
 		solo.clickOnButton(solo.getCurrentActivity().getString(
 				org.sharetomail.R.string.backup_config_button));
 
-		File backupFile = new File(
-				Environment
-						.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-				Constants.CONFIGURATION_BACKUP_FILE);
+		File backupFile = new File(ConfigurationBackupAgent.getBackupFileName());
+		assertTrue(backupFile.exists());
 		assertTrue(backupFile.canRead());
 
 		Properties props = new Properties();
@@ -431,19 +430,23 @@ public class MainActivityTest extends
 		Properties propsFromConfig = new Configuration(sharedPreferences)
 				.toProperties();
 
+		Thread.sleep(2000);
 		assertEquals(propsFromConfig, props);
 	}
 
 	public void testSettings_Restore() throws IOException {
-		File backupFile = new File(
-				Environment
-						.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-				Constants.CONFIGURATION_BACKUP_FILE);
+		assertTrue(
+				"External storage is not available! Please insert SDCARD!",
+				ConfigurationBackupAgent.isExternalStorageReadable()
+						|| ConfigurationBackupAgent
+								.isExternalStorageWriteable());
+
+		File backupFile = new File(ConfigurationBackupAgent.getBackupFileName());
 
 		Properties props = new Properties();
 
 		props.put(Constants.DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
-				defaultEmail);
+				defaultEmailConfigLine);
 		String testEmailSubjectPrefix = "testEmailSubjectPrefix";
 		props.put(Constants.EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY,
 				testEmailSubjectPrefix);
@@ -467,7 +470,6 @@ public class MainActivityTest extends
 		solo.clickOnButton(solo.getCurrentActivity().getString(
 				org.sharetomail.R.string.restore_config_button));
 
-		solo.goBack();
 		solo.goBack();
 
 		openSettings();
