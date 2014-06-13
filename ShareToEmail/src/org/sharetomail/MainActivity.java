@@ -170,7 +170,7 @@ public class MainActivity extends Activity {
 
 	private void startSpecifiedEmailApp(final EmailAddress emailAddress,
 			String subject, String text) {
-		Intent sendMailIntent = new Intent(Intent.ACTION_MAIN);
+		Intent sendMailIntent = new Intent(Intent.ACTION_SENDTO);
 
 		sendMailIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 		sendMailIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
