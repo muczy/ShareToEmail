@@ -22,6 +22,8 @@ public class EmailAppListAdapter extends BaseAdapter {
 
 	private static final String TAG = EmailAppListAdapter.class.getName();
 
+	private static final int EMPTY_APP_LOCATION = 0;
+
 	private Context context;
 
 	private List<ResolveInfo> emailApps = new LinkedList<ResolveInfo>();
@@ -32,7 +34,7 @@ public class EmailAppListAdapter extends BaseAdapter {
 		this.packageManager = packageManager;
 
 		// "Application selector" empty app.
-		emailApps.add(new ResolveInfo());
+		emailApps.add(EMPTY_APP_LOCATION, new ResolveInfo());
 
 		Intent sendMailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
 				Constants.MAILTO_SCHEME, "", null));
@@ -76,7 +78,7 @@ public class EmailAppListAdapter extends BaseAdapter {
 		TextView emailAppTitleTextView = (TextView) rowView
 				.findViewById(R.id.emailAppTitleTextView);
 
-		if (position != 0) {
+		if (position != EMPTY_APP_LOCATION) {
 			try {
 				emailAppImageView.setImageDrawable(emailApps.get(position)
 						.loadIcon(packageManager));
@@ -88,7 +90,7 @@ public class EmailAppListAdapter extends BaseAdapter {
 		}
 
 		CharSequence appLabel;
-		if (position != 0) {
+		if (position != EMPTY_APP_LOCATION) {
 			appLabel = emailApps.get(position).loadLabel(packageManager);
 		} else {
 			appLabel = context.getString(R.string.app_selector);
