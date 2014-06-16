@@ -89,15 +89,6 @@ public class MainActivity extends Activity {
 				this, config.getEmailAddresses(),
 				config.getDefaultEmailAddress());
 		emailAddressesListView.setAdapter(emailAddressesAdapter);
-
-		Log.d("WTF", "config.getEmailAddresses(): "
-				+ config.getEmailAddresses().size());
-		Log.d("WTF",
-				"emailAddressesListView child: "
-						+ emailAddressesListView.getChildCount());
-		Log.d("WTF", "adapter count: "
-				+ emailAddressesListView.getAdapter().getCount());
-
 	}
 
 	public static Resources getResourcesObject() {

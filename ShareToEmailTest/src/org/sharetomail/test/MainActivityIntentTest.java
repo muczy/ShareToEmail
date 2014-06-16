@@ -4,6 +4,7 @@
 package org.sharetomail.test;
 
 import org.sharetomail.MainActivity;
+import org.sharetomail.R;
 import org.sharetomail.util.Constants;
 
 import android.app.KeyguardManager;
@@ -12,15 +13,17 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.test.ActivityInstrumentationTestCase2;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ListView;
 
 import com.robotium.solo.Solo;
 
 public class MainActivityIntentTest extends
 		ActivityInstrumentationTestCase2<MainActivity> {
+
+	private static final String TEST_SUBJECT = "test subject";
+	private static final String TEST_LINK = "http://test.lnk";
+	private static final String CHOOSER_APP_CLASS_NAME = "com.android.internal.app.ChooserActivity";
 
 	private SharedPreferences sharedPreferences;
 
@@ -33,10 +36,11 @@ public class MainActivityIntentTest extends
 		super(MainActivity.class);
 	}
 
-	protected void setupWithIntent(Intent intent) {
-		// Intent intent = new Intent(Intent.ACTION_MAIN);
-		// intent.putExtra(Intent.EXTRA_TEXT, "http://test.lnk");
-		// intent.putExtra(Intent.EXTRA_SUBJECT, "test subject");
+	@Override
+	protected void setUp() {
+		Intent intent = new Intent(Intent.ACTION_MAIN);
+		intent.putExtra(Intent.EXTRA_TEXT, TEST_LINK);
+		intent.putExtra(Intent.EXTRA_SUBJECT, TEST_SUBJECT);
 		setActivityIntent(intent);
 
 		sharedPreferences = getInstrumentation()
@@ -51,9 +55,6 @@ public class MainActivityIntentTest extends
 
 		solo = new Solo(getInstrumentation());
 
-	}
-
-	private void unlockScreen() {
 		KeyguardManager myKM = (KeyguardManager) getActivity()
 				.getSystemService(Context.KEYGUARD_SERVICE);
 		if (myKM.inKeyguardRestrictedInputMode()) {
@@ -88,27 +89,19 @@ public class MainActivityIntentTest extends
 		editor.commit();
 	}
 
-	public void testAddNewEmail_ValidEmail() throws InterruptedException {
-		Intent intent = new Intent(Intent.ACTION_MAIN);
-		intent.putExtra(Intent.EXTRA_TEXT, "http://test.lnk");
-		intent.putExtra(Intent.EXTRA_SUBJECT, "test subject");
-		setupWithIntent(intent);
-		unlockScreen();
+	public void testUseEmailAppChooser() throws InterruptedException {
+		String subjectPrefix = solo.getCurrentActivity().getString(
+				R.string.default_email_subject_prefix);
+		solo.clickOnView(Util.getEmailAddressesListView(solo).getChildAt(0));
 
-		solo.clickOnView(getEmailAddressesListView().getChildAt(0));
+		solo.waitForActivity(CHOOSER_APP_CLASS_NAME, 5000);
+		assertEquals(CHOOSER_APP_CLASS_NAME, solo.getCurrentActivity()
+				.getClass().getName());
 
-		Thread.sleep(1000);
-
-		assertEquals("test subject", solo.getCurrentActivity().getIntent()
-				.getStringExtra(Intent.EXTRA_SUBJECT));
-	}
-
-	private View findViewById(int id) {
-		return solo.getCurrentActivity().findViewById(id);
-	}
-
-	private ListView getEmailAddressesListView() {
-		solo.waitForView(org.sharetomail.R.id.emailAddressesListView, 1, 2000);
-		return (ListView) findViewById(org.sharetomail.R.id.emailAddressesListView);
+		Intent intentToStart = solo.getCurrentActivity().getIntent()
+				.getParcelableExtra(Intent.EXTRA_INTENT);
+		assertEquals(TEST_LINK, intentToStart.getStringExtra(Intent.EXTRA_TEXT));
+		assertEquals(subjectPrefix + TEST_SUBJECT,
+				intentToStart.getStringExtra(Intent.EXTRA_SUBJECT));
 	}
 }

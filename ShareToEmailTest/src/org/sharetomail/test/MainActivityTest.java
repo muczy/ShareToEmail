@@ -130,7 +130,7 @@ public class MainActivityTest extends
 		solo.assertCurrentActivity("Current activity is not "
 				+ MainActivity.class.getName(), MainActivity.class);
 
-		ListAdapter adapter = getEmailAddressesListView().getAdapter();
+		ListAdapter adapter = Util.getEmailAddressesListView(solo).getAdapter();
 
 		assertEquals(testEmail,
 				String.valueOf(adapter.getItem(adapter.getCount() - 1)));
@@ -154,7 +154,7 @@ public class MainActivityTest extends
 		solo.assertCurrentActivity("Current activity is not "
 				+ MainActivity.class.getName(), MainActivity.class);
 
-		ListAdapter adapter = getEmailAddressesListView().getAdapter();
+		ListAdapter adapter = Util.getEmailAddressesListView(solo).getAdapter();
 
 		assertEquals(testEmail,
 				String.valueOf(adapter.getItem(adapter.getCount() - 1)));
@@ -244,7 +244,7 @@ public class MainActivityTest extends
 				+ MainActivity.class.getName(), MainActivity.class);
 
 		// Open email address modification activity and verify email app.
-		ListView addressListView = getEmailAddressesListView();
+		ListView addressListView = Util.getEmailAddressesListView(solo);
 		Thread.sleep(500);
 		solo.clickLongOnView(addressListView.getChildAt(addressListView
 				.getAdapter().getCount() - 1));
@@ -266,7 +266,7 @@ public class MainActivityTest extends
 	public void testModifiedEmail() {
 		String testModifiedEmail = "testModified@example.org";
 
-		solo.clickLongOnView(getEmailAddressesListView().getChildAt(0));
+		solo.clickLongOnView(Util.getEmailAddressesListView(solo).getChildAt(0));
 		solo.clickOnText(solo.getCurrentActivity().getString(
 				org.sharetomail.R.string.modify_email_address_menu_item));
 
@@ -288,26 +288,28 @@ public class MainActivityTest extends
 
 		solo.waitForActivity(MainActivity.class, 10000);
 
-		assertEquals(testModifiedEmail,
-				String.valueOf(getEmailAddressesListView().getAdapter()
-						.getItem(0)));
+		assertEquals(
+				testModifiedEmail,
+				String.valueOf(Util.getEmailAddressesListView(solo)
+						.getAdapter().getItem(0)));
 	}
 
 	public void testDeleteEmail() {
-		solo.clickLongOnView(getEmailAddressesListView().getChildAt(0));
+		solo.clickLongOnView(Util.getEmailAddressesListView(solo).getChildAt(0));
 		solo.clickOnText(solo.getCurrentActivity().getString(
 				org.sharetomail.R.string.delete_email_address_menu_item));
 
 		solo.assertCurrentActivity("Current activity is not "
 				+ MainActivity.class.getName(), MainActivity.class);
 
-		solo.waitForView(getEmailAddressesListView());
+		solo.waitForView(Util.getEmailAddressesListView(solo));
 
-		assertEquals(0, getEmailAddressesListView().getAdapter().getCount());
+		assertEquals(0, Util.getEmailAddressesListView(solo).getAdapter()
+				.getCount());
 	}
 
 	public void testSetDefaultEmail() throws InterruptedException {
-		solo.clickLongOnView(getEmailAddressesListView().getChildAt(0));
+		solo.clickLongOnView(Util.getEmailAddressesListView(solo).getChildAt(0));
 		solo.clickOnText(solo
 				.getCurrentActivity()
 				.getString(
@@ -320,7 +322,7 @@ public class MainActivityTest extends
 	}
 
 	public void testUnsetDefaultEmail() throws InterruptedException {
-		solo.clickLongOnView(getEmailAddressesListView().getChildAt(0));
+		solo.clickLongOnView(Util.getEmailAddressesListView(solo).getChildAt(0));
 		solo.clickOnText(solo
 				.getCurrentActivity()
 				.getString(
@@ -328,7 +330,7 @@ public class MainActivityTest extends
 
 		solo.waitForActivity(MainActivity.class, 2000);
 
-		solo.clickLongOnView(getEmailAddressesListView().getChildAt(0));
+		solo.clickLongOnView(Util.getEmailAddressesListView(solo).getChildAt(0));
 		solo.clickOnText(solo
 				.getCurrentActivity()
 				.getString(
@@ -453,8 +455,9 @@ public class MainActivityTest extends
 
 		solo.waitForActivity(MainActivity.class, 2000);
 
-		assertEquals(defaultEmail, ((TextView) getEmailAddressesListView()
-				.getChildAt(0)).getText().toString());
+		assertEquals(defaultEmail,
+				((TextView) Util.getEmailAddressesListView(solo).getChildAt(0))
+						.getText().toString());
 
 		openSettings();
 
@@ -476,10 +479,5 @@ public class MainActivityTest extends
 						.findViewById(
 								org.sharetomail.R.id.autoUseDefaultEmailAddressCheckBox))
 						.isChecked());
-	}
-
-	private ListView getEmailAddressesListView() {
-		solo.waitForView(org.sharetomail.R.id.emailAddressesListView, 1, 2000);
-		return (ListView) findViewById(org.sharetomail.R.id.emailAddressesListView);
 	}
 }
