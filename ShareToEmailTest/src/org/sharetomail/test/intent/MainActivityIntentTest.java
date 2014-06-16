@@ -1,10 +1,11 @@
 /**
  * 
  */
-package org.sharetomail.test;
+package org.sharetomail.test.intent;
 
 import org.sharetomail.MainActivity;
 import org.sharetomail.R;
+import org.sharetomail.test.Util;
 import org.sharetomail.util.Constants;
 
 import android.app.KeyguardManager;

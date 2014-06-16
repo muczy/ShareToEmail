@@ -4,8 +4,8 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.sharetomail.test.CompatilbityTest;
-import org.sharetomail.test.MainActivityIntentTest;
 import org.sharetomail.test.MainActivityTest;
+import org.sharetomail.test.intent.MainActivityIntentTest;
 
 public class StressTest {
 
