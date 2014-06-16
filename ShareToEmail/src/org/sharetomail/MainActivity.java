@@ -65,6 +65,7 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		// TODO: remove this?
 		getPreferences(MODE_PRIVATE);
 
 		config = new Configuration(getSharedPreferences(
@@ -88,6 +89,14 @@ public class MainActivity extends Activity {
 				this, config.getEmailAddresses(),
 				config.getDefaultEmailAddress());
 		emailAddressesListView.setAdapter(emailAddressesAdapter);
+
+		Log.d("WTF", "config.getEmailAddresses(): "
+				+ config.getEmailAddresses().size());
+		Log.d("WTF",
+				"emailAddressesListView child: "
+						+ emailAddressesListView.getChildCount());
+		Log.d("WTF", "adapter count: "
+				+ emailAddressesListView.getAdapter().getCount());
 
 	}
 
