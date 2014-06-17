@@ -19,7 +19,7 @@ import android.view.WindowManager;
 
 import com.robotium.solo.Solo;
 
-public class MainActivityIntentTest extends
+public class EmailAppChooserTest extends
 		ActivityInstrumentationTestCase2<MainActivity> {
 
 	private static final String TEST_SUBJECT = "test subject";
@@ -33,7 +33,7 @@ public class MainActivityIntentTest extends
 	private String defaultEmailConfigLine = "{\"EMAIL_APP_PACKAGE_NAME\":\"\",\"EMAIL_APP_NAME\":\"\",\"EMAIL_ADDRESS\":\""
 			+ defaultEmail + "\"}";
 
-	public MainActivityIntentTest() {
+	public EmailAppChooserTest() {
 		super(MainActivity.class);
 	}
 
