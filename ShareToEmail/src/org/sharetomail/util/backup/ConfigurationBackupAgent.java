@@ -27,7 +27,7 @@ public class ConfigurationBackupAgent {
 		try {
 			props.store(new FileWriter(backupFile), "Backup creation date:");
 		} catch (IOException e) {
-			throw new BackupException(R.string.error_while_loading_backup,
+			throw new BackupException(R.string.error_while_creating_backup,
 					backupFile.getAbsolutePath(), e);
 		}
 	}
