@@ -47,4 +47,5 @@ public class Constants {
 	public static final String CONFIGURATION_BACKUP_FILE = "sharetoemail-backup.properties";
 
 	public static final String EMAIL_HOSTNAME_TLD = ".com";
+	public static final String ERROR_LOG_FILE_NAME = "shareToEmail-error.log";
 }

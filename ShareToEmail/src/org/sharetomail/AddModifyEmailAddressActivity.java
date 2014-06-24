@@ -50,6 +50,9 @@ public class AddModifyEmailAddressActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		Util.uncaughtExceptionHandling();
+
 		setContentView(R.layout.activity_add_email_address);
 		// Show the Up button in the action bar.
 		setupActionBar();

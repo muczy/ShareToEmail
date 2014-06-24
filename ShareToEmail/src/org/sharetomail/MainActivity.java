@@ -19,6 +19,7 @@ import org.sharetomail.util.Configuration;
 import org.sharetomail.util.Constants;
 import org.sharetomail.util.DefaultItemHandlingAdapter;
 import org.sharetomail.util.EmailAddress;
+import org.sharetomail.util.Util;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -63,6 +64,9 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		Util.uncaughtExceptionHandling();
+
 		setContentView(R.layout.activity_main);
 
 		getPreferences(MODE_PRIVATE);

@@ -2,6 +2,7 @@ package org.sharetomail;
 
 import org.sharetomail.util.Constants;
 import org.sharetomail.util.EmailAppListAdapter;
+import org.sharetomail.util.Util;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -21,6 +22,9 @@ public class EmailAppSelectorActivity extends Activity implements
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		Util.uncaughtExceptionHandling();
+
 		setContentView(R.layout.activity_email_app_selector);
 
 		emailAppListAdapter = new EmailAppListAdapter(this, getPackageManager());
@@ -47,12 +51,12 @@ public class EmailAppSelectorActivity extends Activity implements
 			long id) {
 		Intent data = new Intent();
 
-		if (emailAppListAdapter.getItem(position).activityInfo == null) {
-			data.putExtra(Constants.EMAIL_APP_NAME_INTENT_KEY, "");
-		} else {
-			data.putExtra(Constants.EMAIL_APP_NAME_INTENT_KEY,
-					emailAppListAdapter.getItem(position).activityInfo.name);
-		}
+		// if (emailAppListAdapter.getItem(position).activityInfo == null) {
+		// data.putExtra(Constants.EMAIL_APP_NAME_INTENT_KEY, "");
+		// } else {
+		data.putExtra(Constants.EMAIL_APP_NAME_INTENT_KEY,
+				emailAppListAdapter.getItem(position).activityInfo.name);
+		// }
 
 		if (emailAppListAdapter.getItem(position).activityInfo == null) {
 			data.putExtra(Constants.EMAIL_APP_PACKAGE_NAME_INTENT_KEY, "");
