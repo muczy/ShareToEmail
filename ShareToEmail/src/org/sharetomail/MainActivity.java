@@ -27,6 +27,7 @@ import android.app.AlertDialog.Builder;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources;
@@ -61,6 +62,8 @@ public class MainActivity extends Activity {
 
 	private EmailAddress selectedItem;
 
+	private SharedPreferences sharedPreferences;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -69,10 +72,11 @@ public class MainActivity extends Activity {
 
 		setContentView(R.layout.activity_main);
 
-		getPreferences(MODE_PRIVATE);
+		sharedPreferences = getSharedPreferences(
+				Constants.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
+		config = new Configuration(sharedPreferences);
 
-		config = new Configuration(getSharedPreferences(
-				Constants.SHARED_PREFERENCES_NAME, MODE_PRIVATE));
+		dumpIntentToDebugLog("onCreate", getIntent());
 
 		mResources = getResources();
 
@@ -93,6 +97,13 @@ public class MainActivity extends Activity {
 				config.getDefaultEmailAddress());
 		emailAddressesListView.setAdapter(emailAddressesAdapter);
 
+	}
+
+	private void dumpIntentToDebugLog(String method, Intent intent) {
+		StringBuilder builder = new StringBuilder();
+		builder.append(method).append("\n");
+		builder.append(Util.dumpIntent(intent));
+		Util.writeDebugLog(sharedPreferences, builder.toString());
 	}
 
 	public static Resources getResourcesObject() {
@@ -166,6 +177,8 @@ public class MainActivity extends Activity {
 				config.getEmailSubjectPrefix() + subject);
 		sendMailIntent.putExtra(Intent.EXTRA_TEXT, text);
 
+		dumpIntentToDebugLog("startEmailAppSelector", sendMailIntent);
+
 		startActivity(Intent.createChooser(sendMailIntent,
 				getString(R.string.send_email)));
 
@@ -188,6 +201,8 @@ public class MainActivity extends Activity {
 
 		sendMailIntent.setClassName(emailAddress.getEmailAppPackageName(),
 				emailAddress.getEmailAppName());
+
+		dumpIntentToDebugLog("startSpecifiedEmailApp", sendMailIntent);
 
 		try {
 			startActivity(sendMailIntent);

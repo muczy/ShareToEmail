@@ -41,11 +41,16 @@ public class Constants {
 	public static final String DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY = "default_email_address";
 	public static final String EMAIL_SUBJECT_PREFIX_SHARED_PREFERENCES_KEY = "email_subject_prefix";
 	public static final String AUTO_USE_DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY = "auto_use_default_email_address";
+	public static final String DEBUG_LOG_ENABLED_SHARED_PREFERENCES_KEY = "debug_log_enabled";
 	public static final String AUTO_USE_DEFAULT_EMAIL_ADDRESS_DEFAULT_VALUE = Boolean.TRUE
 			.toString();
+	public static final boolean DEBUG_LOG_ENABLED_DEFAULT_VALUE = true;
 
 	public static final String CONFIGURATION_BACKUP_FILE = "sharetoemail-backup.properties";
 
 	public static final String EMAIL_HOSTNAME_TLD = ".com";
+
+	public static final String LOG_FILE_NAME = "shareToEmail.log";
 	public static final String ERROR_LOG_FILE_NAME = "shareToEmail-error.log";
+	public static final String LOG_MESSAGE_SEPARATOR = "==========\n";
 }
