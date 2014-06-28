@@ -41,5 +41,6 @@
     <string name="email_app_image_content_description">Email program ikon</string>
     <string name="app_selector">Alkalmazás választó</string>
     <string name="email_app_selector_button_label">E-mail program ehhez az e-mail címhez</string>
+    <string name="debug_log_enabled">Hibakereső napló engedélyezve</string>
 
 </resources>

@@ -99,6 +99,23 @@ public class MainActivity extends Activity {
 
 	}
 
+	@Override
+	protected void onStart() {
+		super.onStart();
+
+		dumpIntentToDebugLog("onStart", getIntent());
+
+		// If we have a default email address and the auto use option is set
+		// then don't even prompt the user.
+		if (!config.getDefaultEmailAddress().getEmailAddress().isEmpty()
+				&& getIntent().hasExtra(Intent.EXTRA_TEXT)
+				&& config.isAutoUseDefaultEmailAddress()) {
+			sendEmail(config.getDefaultEmailAddress());
+
+			return;
+		}
+	}
+
 	private void dumpIntentToDebugLog(String method, Intent intent) {
 		StringBuilder builder = new StringBuilder();
 		builder.append(method).append("\n");
@@ -170,8 +187,9 @@ public class MainActivity extends Activity {
 
 	private void startEmailAppSelector(EmailAddress emailAddress,
 			String subject, String text) {
-		Intent sendMailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-				Constants.MAILTO_SCHEME, emailAddress.getEmailAddress(), null));
+		Intent sendMailIntent = new Intent(Intent.ACTION_SEND_MULTIPLE,
+				Uri.fromParts(Constants.MAILTO_SCHEME,
+						emailAddress.getEmailAddress(), null));
 
 		sendMailIntent.putExtra(Intent.EXTRA_SUBJECT,
 				config.getEmailSubjectPrefix() + subject);
@@ -187,11 +205,10 @@ public class MainActivity extends Activity {
 
 	private void startSpecifiedEmailApp(final EmailAddress emailAddress,
 			String subject, String text) {
-		Intent sendMailIntent = new Intent(Intent.ACTION_SENDTO);
+		Intent sendMailIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
 
 		sendMailIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-		sendMailIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-				| Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+		sendMailIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
 		sendMailIntent.putExtra(Intent.EXTRA_EMAIL,
 				new String[] { emailAddress.getEmailAddress() });

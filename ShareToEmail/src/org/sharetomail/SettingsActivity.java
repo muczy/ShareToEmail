@@ -40,6 +40,7 @@ public class SettingsActivity extends Activity implements OnClickListener {
 
 	private CheckBox autoUseDefaultEmailAddressCheckBox;
 	private EditText emailSubjectPrefixEditText;
+	private CheckBox debugLogEnabledCheckBox;
 	private Button backupConfigButton;
 	private Button restoreConfigButton;
 
@@ -59,6 +60,7 @@ public class SettingsActivity extends Activity implements OnClickListener {
 	private void initWidgets() {
 		autoUseDefaultEmailAddressCheckBox = (CheckBox) findViewById(R.id.autoUseDefaultEmailAddressCheckBox);
 		emailSubjectPrefixEditText = (EditText) findViewById(R.id.emailSubjectPrefixEditText);
+		debugLogEnabledCheckBox = (CheckBox) findViewById(R.id.debugLogEnabledCheckBox);
 		backupConfigButton = (Button) findViewById(R.id.backupConfigButton);
 		restoreConfigButton = (Button) findViewById(R.id.restoreConfigButton);
 
@@ -73,14 +75,18 @@ public class SettingsActivity extends Activity implements OnClickListener {
 			autoUseDefaultEmailAddressCheckBox.setChecked(true);
 		}
 
+		if (config.isDebugLogEnabled()) {
+			debugLogEnabledCheckBox.setChecked(true);
+		}
+
 		emailSubjectPrefixEditText.setText(config.getEmailSubjectPrefix());
 	}
 
 	@Override
 	public void onBackPressed() {
-		// Get values from UI controls, put them into the intent and return.
 		config.setAutoUseDefaultEmailAddress(autoUseDefaultEmailAddressCheckBox
 				.isChecked());
+		config.setDebugLogEnabled(debugLogEnabledCheckBox.isChecked());
 
 		config.setEmailSubjectPrefix(emailSubjectPrefixEditText.getText()
 				.toString());

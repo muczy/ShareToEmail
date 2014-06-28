@@ -159,6 +159,21 @@ public class Configuration {
 		editor.commit();
 	}
 
+	public boolean isDebugLogEnabled() {
+		return sharedPreferences.getBoolean(
+				Constants.DEBUG_LOG_ENABLED_SHARED_PREFERENCES_KEY,
+				Constants.DEBUG_LOG_ENABLED_DEFAULT_VALUE);
+	}
+
+	public void setDebugLogEnabled(boolean debugLogEnabled) {
+		SharedPreferences.Editor editor = sharedPreferences.edit();
+
+		editor.putBoolean(Constants.DEBUG_LOG_ENABLED_SHARED_PREFERENCES_KEY,
+				debugLogEnabled);
+
+		editor.commit();
+	}
+
 	public Properties toProperties() {
 		Properties properties = new Properties();
 
@@ -185,6 +200,8 @@ public class Configuration {
 		properties
 				.put(Constants.AUTO_USE_DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
 						String.valueOf(isAutoUseDefaultEmailAddress()));
+		properties.put(Constants.DEBUG_LOG_ENABLED_SHARED_PREFERENCES_KEY,
+				String.valueOf(isDebugLogEnabled()));
 
 		return properties;
 	}
@@ -216,6 +233,11 @@ public class Configuration {
 				.parseBoolean(properties
 						.getProperty(
 								Constants.AUTO_USE_DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
-								Constants.AUTO_USE_DEFAULT_EMAIL_ADDRESS_DEFAULT_VALUE)));
+								String.valueOf(Constants.AUTO_USE_DEFAULT_EMAIL_ADDRESS_DEFAULT_VALUE))));
+
+		setDebugLogEnabled(Boolean.parseBoolean(properties.getProperty(
+				Constants.DEBUG_LOG_ENABLED_SHARED_PREFERENCES_KEY,
+				String.valueOf(Constants.DEBUG_LOG_ENABLED_DEFAULT_VALUE))));
 	}
+
 }

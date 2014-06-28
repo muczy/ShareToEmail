@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -77,11 +78,9 @@ public class Util {
 
 	public static void writeDebugLog(SharedPreferences sharedPreferences,
 			String text) {
-		if (sharedPreferences
-				.contains(Constants.DEBUG_LOG_ENABLED_SHARED_PREFERENCES_KEY)
-				&& sharedPreferences.getBoolean(
-						Constants.DEBUG_LOG_ENABLED_SHARED_PREFERENCES_KEY,
-						Constants.DEBUG_LOG_ENABLED_DEFAULT_VALUE)) {
+		if (sharedPreferences.getBoolean(
+				Constants.DEBUG_LOG_ENABLED_SHARED_PREFERENCES_KEY,
+				Constants.DEBUG_LOG_ENABLED_DEFAULT_VALUE)) {
 			writeDebugLog(text);
 		}
 	}
@@ -94,7 +93,8 @@ public class Util {
 					+ File.separator + Constants.LOG_FILE_NAME;
 			printWriter = new PrintWriter(new FileWriter(filename, true));
 
-			printWriter.append(getFormattedTime() + "\n");
+			printWriter.append(getFormattedTime()).append("\n");
+			printWriter.append(text).append("\n");
 			printWriter.append(Constants.LOG_MESSAGE_SEPARATOR);
 
 			printWriter.flush();
@@ -104,20 +104,33 @@ public class Util {
 		}
 	}
 
-	public static String dumpIntent(Intent i) {
+	public static String dumpIntent(Intent intent) {
 		StringBuilder builder = new StringBuilder();
 
-		Bundle bundle = i.getExtras();
+		builder.append("Dumping Intent start\n");
+		builder.append("Action: ").append(intent.getAction()).append("\n");
+		builder.append("Scheme: ").append(intent.getScheme()).append("\n");
+		builder.append("Flags: ").append(intent.getFlags()).append("\n");
+
+		Bundle bundle = intent.getExtras();
 		if (bundle != null) {
 			Set<String> keys = bundle.keySet();
 			Iterator<String> it = keys.iterator();
-			builder.append("Dumping Intent start");
 			while (it.hasNext()) {
 				String key = it.next();
-				builder.append("[" + key + "=" + bundle.get(key) + "]");
+				Object value = bundle.get(key);
+
+				if (value instanceof String[]) {
+					builder.append("[" + key + "="
+							+ Arrays.toString((String[]) value) + "]\n");
+				} else {
+					builder.append("[" + key + "=" + String.valueOf(value)
+							+ "]\n");
+				}
 			}
-			builder.append("Dumping Intent end");
 		}
+
+		builder.append("Dumping Intent end\n");
 
 		return builder.toString();
 	}

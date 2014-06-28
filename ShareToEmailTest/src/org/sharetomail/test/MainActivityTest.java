@@ -383,6 +383,26 @@ public class MainActivityTest extends
 						false));
 	}
 
+	public void testSettings_DebugLogEnabled() {
+		openSettings();
+
+		solo.clickOnCheckBox(1);
+
+		solo.goBack();
+
+		assertTrue(sharedPreferences.getBoolean(
+				Constants.DEBUG_LOG_ENABLED_SHARED_PREFERENCES_KEY, false));
+
+		openSettings();
+
+		solo.clickOnCheckBox(1);
+
+		solo.goBack();
+
+		assertFalse(sharedPreferences.getBoolean(
+				Constants.DEBUG_LOG_ENABLED_SHARED_PREFERENCES_KEY, true));
+	}
+
 	public void testSettings_EmailSubjectPrefix() {
 		openSettings();
 
