@@ -41,7 +41,8 @@
     <string name="auto_use_default_email_address_setting_text">Automatically use the default email address</string>
     <string name="subject_prefix_setting_text">Email subject prefix:</string>
     <string name="email_app_image_content_description">Email application icon</string>
-    <string name="app_selector">Application selector</string>
+    <string name="app_chooser">Application chooser</string>
     <string name="email_app_selector_button_label">Email application for this email address</string>
+    <string name="debug_log_enabled">Debug log enabled</string>
 
 </resources>

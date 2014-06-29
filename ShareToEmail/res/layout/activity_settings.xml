@@ -65,6 +65,34 @@
             android:layout_marginTop="@dimen/activity_space_margin_top"
             android:background="@color/activity_space_background" />
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <CheckBox
+                android:id="@+id/debugLogEnabledCheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true" />
+
+            <TextView
+                android:id="@+id/debugLogEnabledTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:text="@string/debug_log_enabled" />
+
+        </RelativeLayout>
+        
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="@dimen/activity_space_height"
+            android:layout_marginBottom="@dimen/activity_space_margin_bottom"
+            android:layout_marginTop="@dimen/activity_space_margin_top"
+            android:background="@color/activity_space_background" />
+
         <Button
             android:id="@+id/backupConfigButton"
             android:layout_width="fill_parent"

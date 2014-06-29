@@ -31,7 +31,7 @@
         android:text="@string/add_email_address_button" />
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/debugLogEnabledTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/emailAddressEditText"
@@ -44,8 +44,8 @@
         android:id="@+id/emailAppButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textView1"
+        android:layout_below="@+id/debugLogEnabledTextView"
         android:layout_centerHorizontal="true"
-        android:text="@string/app_selector" />
+        android:text="@string/app_chooser" />
 
 </RelativeLayout>

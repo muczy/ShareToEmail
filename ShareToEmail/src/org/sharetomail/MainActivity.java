@@ -19,6 +19,7 @@ import org.sharetomail.util.Configuration;
 import org.sharetomail.util.Constants;
 import org.sharetomail.util.DefaultItemHandlingAdapter;
 import org.sharetomail.util.EmailAddress;
+import org.sharetomail.util.Util;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -26,6 +27,7 @@ import android.app.AlertDialog.Builder;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources;
@@ -60,16 +62,22 @@ public class MainActivity extends Activity {
 
 	private EmailAddress selectedItem;
 
+	private SharedPreferences sharedPreferences;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		Util.uncaughtExceptionHandling();
+
 		setContentView(R.layout.activity_main);
 
 		// TODO: remove this?
-		getPreferences(MODE_PRIVATE);
+		sharedPreferences = getSharedPreferences(
+				Constants.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
+		config = new Configuration(sharedPreferences);
 
-		config = new Configuration(getSharedPreferences(
-				Constants.SHARED_PREFERENCES_NAME, MODE_PRIVATE));
+		dumpIntentToDebugLog("onCreate", getIntent());
 
 		mResources = getResources();
 
@@ -89,6 +97,30 @@ public class MainActivity extends Activity {
 				this, config.getEmailAddresses(),
 				config.getDefaultEmailAddress());
 		emailAddressesListView.setAdapter(emailAddressesAdapter);
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+
+		dumpIntentToDebugLog("onStart", getIntent());
+
+		// If we have a default email address and the auto use option is set
+		// then don't even prompt the user.
+		if (!config.getDefaultEmailAddress().getEmailAddress().isEmpty()
+				&& getIntent().hasExtra(Intent.EXTRA_TEXT)
+				&& config.isAutoUseDefaultEmailAddress()) {
+			sendEmail(config.getDefaultEmailAddress());
+
+			return;
+		}
+	}
+
+	private void dumpIntentToDebugLog(String method, Intent intent) {
+		StringBuilder builder = new StringBuilder();
+		builder.append(method).append("\n");
+		builder.append(Util.dumpIntent(intent));
+		Util.writeDebugLog(sharedPreferences, builder.toString());
 	}
 
 	public static Resources getResourcesObject() {
@@ -155,12 +187,15 @@ public class MainActivity extends Activity {
 
 	private void startEmailAppSelector(EmailAddress emailAddress,
 			String subject, String text) {
-		Intent sendMailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-				Constants.MAILTO_SCHEME, emailAddress.getEmailAddress(), null));
+		Intent sendMailIntent = new Intent(Intent.ACTION_SEND_MULTIPLE,
+				Uri.fromParts(Constants.MAILTO_SCHEME,
+						emailAddress.getEmailAddress(), null));
 
 		sendMailIntent.putExtra(Intent.EXTRA_SUBJECT,
 				config.getEmailSubjectPrefix() + subject);
 		sendMailIntent.putExtra(Intent.EXTRA_TEXT, text);
+
+		dumpIntentToDebugLog("startEmailAppSelector", sendMailIntent);
 
 		startActivity(Intent.createChooser(sendMailIntent,
 				getString(R.string.send_email)));
@@ -170,11 +205,10 @@ public class MainActivity extends Activity {
 
 	private void startSpecifiedEmailApp(final EmailAddress emailAddress,
 			String subject, String text) {
-		Intent sendMailIntent = new Intent(Intent.ACTION_SENDTO);
+		Intent sendMailIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
 
 		sendMailIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-		sendMailIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-				| Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+		sendMailIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
 		sendMailIntent.putExtra(Intent.EXTRA_EMAIL,
 				new String[] { emailAddress.getEmailAddress() });
@@ -184,6 +218,8 @@ public class MainActivity extends Activity {
 
 		sendMailIntent.setClassName(emailAddress.getEmailAppPackageName(),
 				emailAddress.getEmailAppName());
+
+		dumpIntentToDebugLog("startSpecifiedEmailApp", sendMailIntent);
 
 		try {
 			startActivity(sendMailIntent);

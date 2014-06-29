@@ -50,6 +50,9 @@ public class AddModifyEmailAddressActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		Util.uncaughtExceptionHandling();
+
 		setContentView(R.layout.activity_add_email_address);
 		// Show the Up button in the action bar.
 		setupActionBar();
@@ -212,7 +215,7 @@ public class AddModifyEmailAddressActivity extends Activity {
 		if (emailAppLabel == null || emailAppLabel.length() == 0) {
 			emailAppName = "";
 			emailAppPackageName = "";
-			emailAppLabel = getString(R.string.app_selector);
+			emailAppLabel = getString(R.string.app_chooser);
 		}
 
 		emailAppButton.setText(emailAppLabel);

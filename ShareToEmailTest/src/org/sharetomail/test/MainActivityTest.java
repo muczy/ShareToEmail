@@ -204,7 +204,7 @@ public class MainActivityTest extends
 
 		// Set an email app for the test email address.
 		solo.clickOnButton(solo.getCurrentActivity().getString(
-				org.sharetomail.R.string.app_selector));
+				org.sharetomail.R.string.app_chooser));
 
 		solo.waitForActivity(EmailAppSelectorActivity.class, 10000);
 
@@ -382,6 +382,26 @@ public class MainActivityTest extends
 				.getBoolean(
 						Constants.AUTO_USE_DEFAULT_EMAIL_ADDRESS_SHARED_PREFERENCES_KEY,
 						false));
+	}
+
+	public void testSettings_DebugLogEnabled() {
+		openSettings();
+
+		solo.clickOnCheckBox(1);
+
+		solo.goBack();
+
+		assertTrue(sharedPreferences.getBoolean(
+				Constants.DEBUG_LOG_ENABLED_SHARED_PREFERENCES_KEY, false));
+
+		openSettings();
+
+		solo.clickOnCheckBox(1);
+
+		solo.goBack();
+
+		assertFalse(sharedPreferences.getBoolean(
+				Constants.DEBUG_LOG_ENABLED_SHARED_PREFERENCES_KEY, true));
 	}
 
 	public void testSettings_EmailSubjectPrefix() {
