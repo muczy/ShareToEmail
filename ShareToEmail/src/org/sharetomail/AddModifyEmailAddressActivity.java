@@ -215,7 +215,7 @@ public class AddModifyEmailAddressActivity extends Activity {
 		if (emailAppLabel == null || emailAppLabel.length() == 0) {
 			emailAppName = "";
 			emailAppPackageName = "";
-			emailAppLabel = getString(R.string.app_selector);
+			emailAppLabel = getString(R.string.app_chooser);
 		}
 
 		emailAppButton.setText(emailAppLabel);

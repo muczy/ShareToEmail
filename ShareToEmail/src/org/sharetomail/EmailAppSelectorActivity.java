@@ -51,12 +51,12 @@ public class EmailAppSelectorActivity extends Activity implements
 			long id) {
 		Intent data = new Intent();
 
-		// if (emailAppListAdapter.getItem(position).activityInfo == null) {
-		// data.putExtra(Constants.EMAIL_APP_NAME_INTENT_KEY, "");
-		// } else {
-		data.putExtra(Constants.EMAIL_APP_NAME_INTENT_KEY,
-				emailAppListAdapter.getItem(position).activityInfo.name);
-		// }
+		if (emailAppListAdapter.getItem(position).activityInfo == null) {
+			data.putExtra(Constants.EMAIL_APP_NAME_INTENT_KEY, "");
+		} else {
+			data.putExtra(Constants.EMAIL_APP_NAME_INTENT_KEY,
+					emailAppListAdapter.getItem(position).activityInfo.name);
+		}
 
 		if (emailAppListAdapter.getItem(position).activityInfo == null) {
 			data.putExtra(Constants.EMAIL_APP_PACKAGE_NAME_INTENT_KEY, "");

@@ -205,7 +205,7 @@ public class MainActivityTest extends
 
 		// Set an email app for the test email address.
 		solo.clickOnButton(solo.getCurrentActivity().getString(
-				org.sharetomail.R.string.app_selector));
+				org.sharetomail.R.string.app_chooser));
 
 		solo.waitForActivity(EmailAppSelectorActivity.class, 10000);
 

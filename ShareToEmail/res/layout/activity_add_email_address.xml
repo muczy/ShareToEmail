@@ -46,6 +46,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/debugLogEnabledTextView"
         android:layout_centerHorizontal="true"
-        android:text="@string/app_selector" />
+        android:text="@string/app_chooser" />
 
 </RelativeLayout>

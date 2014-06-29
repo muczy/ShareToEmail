@@ -69,9 +69,13 @@ public class EmailAppListAdapter extends BaseAdapter {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View rowView = convertView;
-		LayoutInflater inflater = (LayoutInflater) context
-				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		rowView = inflater.inflate(R.layout.email_app_list_item, parent, false);
+
+		if (rowView == null) {
+			LayoutInflater inflater = (LayoutInflater) context
+					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			rowView = inflater.inflate(R.layout.email_app_list_item, parent,
+					false);
+		}
 
 		ImageView emailAppImageView = (ImageView) rowView
 				.findViewById(R.id.emailAppImageView);
@@ -87,13 +91,15 @@ public class EmailAppListAdapter extends BaseAdapter {
 						"IllegalStateException while loading icon for email app!",
 						e);
 			}
+		} else {
+			emailAppImageView.setVisibility(View.INVISIBLE);
 		}
 
 		CharSequence appLabel;
 		if (position != EMPTY_APP_LOCATION) {
 			appLabel = emailApps.get(position).loadLabel(packageManager);
 		} else {
-			appLabel = context.getString(R.string.app_selector);
+			appLabel = context.getString(R.string.app_chooser);
 		}
 
 		emailAppTitleTextView.setText(appLabel);
