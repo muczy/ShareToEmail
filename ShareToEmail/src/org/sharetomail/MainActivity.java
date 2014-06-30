@@ -170,7 +170,8 @@ public class MainActivity extends Activity {
 	}
 
 	private void sendEmail(EmailAddress emailAddress) {
-		String textFromIntent = getIntent().getStringExtra(Intent.EXTRA_TEXT);
+		String textFromIntent = getIntent().getExtras()
+				.getCharSequence(Intent.EXTRA_TEXT).toString();
 
 		String subjectFromIntent = getSubject(textFromIntent);
 

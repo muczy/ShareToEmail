@@ -3,10 +3,16 @@
  */
 package org.sharetomail.test.intent;
 
-import java.util.List;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Properties;
 
 import org.sharetomail.MainActivity;
 import org.sharetomail.R;
+import org.sharetomail.test.DummyEmailAppActivity;
 import org.sharetomail.test.Util;
 import org.sharetomail.util.Constants;
 
@@ -15,11 +21,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.net.Uri;
 import android.test.ActivityInstrumentationTestCase2;
-import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -30,8 +32,10 @@ public class SpecifiedAppTest extends
 
 	private static final String TEST_SUBJECT = "test subject";
 	private static final String TEST_LINK = "http://test.lnk";
-	private static final String EMAIL_APP_NAME = "org.sharetomail.util.DummyTestActivity";
-	private static final String EMAIL_APP_PKG_NAME = "org.sharetomail.util";
+	private static final String EMAIL_APP_NAME = DummyEmailAppActivity.class
+			.getName();
+	private static final String EMAIL_APP_PKG_NAME = DummyEmailAppActivity.class
+			.getPackage().getName();
 
 	private SharedPreferences sharedPreferences;
 
@@ -41,6 +45,7 @@ public class SpecifiedAppTest extends
 	private String defaultEmailConfigLine = "{\"EMAIL_APP_PACKAGE_NAME\":\""
 			+ EMAIL_APP_PKG_NAME + "\",\"EMAIL_APP_NAME\":\"" + EMAIL_APP_NAME
 			+ "\",\"EMAIL_ADDRESS\":\"" + defaultEmail + "\"}";
+	private File resultFile;
 
 	public SpecifiedAppTest() {
 		super(MainActivity.class);
@@ -64,6 +69,12 @@ public class SpecifiedAppTest extends
 		addDefaultEmail();
 
 		solo = new Solo(getInstrumentation());
+
+		resultFile = DummyEmailAppActivity.getResultFile();
+
+		if (resultFile.exists()) {
+			resultFile.delete();
+		}
 
 		KeyguardManager myKM = (KeyguardManager) getActivity()
 				.getSystemService(Context.KEYGUARD_SERVICE);
@@ -108,32 +119,25 @@ public class SpecifiedAppTest extends
 		return super.getActivity();
 	}
 
-	public void testUseSpecifiedApp() throws InterruptedException {
+	public void testUseSpecifiedApp() throws InterruptedException,
+			FileNotFoundException, IOException {
 		String subjectPrefix = solo.getCurrentActivity().getString(
 				R.string.default_email_subject_prefix);
 		solo.clickOnView(Util.getEmailAddressesListView(solo).getChildAt(0));
-		Intent sendMailIntent = new Intent(Intent.ACTION_SEND_MULTIPLE,
-				Uri.fromParts(Constants.MAILTO_SCHEME, "", null));
-		List<ResolveInfo> t = solo
-				.getCurrentActivity()
-				.getPackageManager()
-				.queryIntentActivities(sendMailIntent,
-						PackageManager.MATCH_DEFAULT_ONLY);
-		for (ResolveInfo resolveInfo : t) {
-			Log.d("WTF", resolveInfo.activityInfo.processName);
-		}
+
 		Thread.sleep(1000);
 
-		fail(solo.getCurrentActivity().getClass().getName());
+		assertTrue(resultFile.exists());
+		assertTrue(resultFile.isFile());
+		assertTrue(resultFile.canRead());
 
-		solo.waitForActivity(EMAIL_APP_NAME, 5000);
-		assertEquals(EMAIL_APP_NAME, solo.getCurrentActivity().getClass()
-				.getName());
+		Properties resultProps = new Properties();
+		resultProps.load(new FileInputStream(resultFile));
 
-		Intent intentToStart = solo.getCurrentActivity().getIntent()
-				.getParcelableExtra(Intent.EXTRA_INTENT);
-		assertEquals(TEST_LINK, intentToStart.getStringExtra(Intent.EXTRA_TEXT));
+		assertEquals(Arrays.toString(new String[] { defaultEmail }),
+				resultProps.getProperty(Intent.EXTRA_EMAIL));
+		assertEquals(TEST_LINK, resultProps.get(Intent.EXTRA_TEXT));
 		assertEquals(subjectPrefix + TEST_SUBJECT,
-				intentToStart.getStringExtra(Intent.EXTRA_SUBJECT));
+				resultProps.get(Intent.EXTRA_SUBJECT));
 	}
 }

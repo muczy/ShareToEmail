@@ -6,6 +6,8 @@ import junit.framework.TestSuite;
 import org.sharetomail.test.CompatilbityTest;
 import org.sharetomail.test.MainActivityTest;
 import org.sharetomail.test.intent.EmailAppChooserTest;
+import org.sharetomail.test.intent.NonExistentSpecifiedEmailApp;
+import org.sharetomail.test.intent.SpecifiedAppTest;
 
 public class StressTest {
 
@@ -18,6 +20,8 @@ public class StressTest {
 			suite.addTestSuite(MainActivityTest.class);
 			suite.addTestSuite(CompatilbityTest.class);
 			suite.addTestSuite(EmailAppChooserTest.class);
+			suite.addTestSuite(NonExistentSpecifiedEmailApp.class);
+			suite.addTestSuite(SpecifiedAppTest.class);
 		}
 
 		return suite;
