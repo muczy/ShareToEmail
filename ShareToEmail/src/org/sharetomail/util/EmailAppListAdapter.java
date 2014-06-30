@@ -36,6 +36,7 @@ public class EmailAppListAdapter extends BaseAdapter {
 		// "Application selector" empty app.
 		emailApps.add(EMPTY_APP_LOCATION, new ResolveInfo());
 
+		// TODO: not sendto!
 		Intent sendMailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
 				Constants.MAILTO_SCHEME, "", null));
 		emailApps.addAll(packageManager.queryIntentActivities(sendMailIntent,

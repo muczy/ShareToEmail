@@ -3,29 +3,35 @@
  */
 package org.sharetomail.test.intent;
 
+import java.util.List;
+
 import org.sharetomail.MainActivity;
 import org.sharetomail.R;
 import org.sharetomail.test.Util;
 import org.sharetomail.util.Constants;
-
-import com.robotium.solo.Solo;
 
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.net.Uri;
 import android.test.ActivityInstrumentationTestCase2;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
+
+import com.robotium.solo.Solo;
 
 public class SpecifiedAppTest extends
 		ActivityInstrumentationTestCase2<MainActivity> {
 
 	private static final String TEST_SUBJECT = "test subject";
 	private static final String TEST_LINK = "http://test.lnk";
-	private static final String EMAIL_APP_NAME = "com.google.android.gm.ComposeActivityGmail";
-	private static final String EMAIL_APP_PKG_NAME = "com.google.android.gm";
+	private static final String EMAIL_APP_NAME = "org.sharetomail.util.DummyTestActivity";
+	private static final String EMAIL_APP_PKG_NAME = "org.sharetomail.util";
 
 	private SharedPreferences sharedPreferences;
 
@@ -106,6 +112,16 @@ public class SpecifiedAppTest extends
 		String subjectPrefix = solo.getCurrentActivity().getString(
 				R.string.default_email_subject_prefix);
 		solo.clickOnView(Util.getEmailAddressesListView(solo).getChildAt(0));
+		Intent sendMailIntent = new Intent(Intent.ACTION_SEND_MULTIPLE,
+				Uri.fromParts(Constants.MAILTO_SCHEME, "", null));
+		List<ResolveInfo> t = solo
+				.getCurrentActivity()
+				.getPackageManager()
+				.queryIntentActivities(sendMailIntent,
+						PackageManager.MATCH_DEFAULT_ONLY);
+		for (ResolveInfo resolveInfo : t) {
+			Log.d("WTF", resolveInfo.activityInfo.processName);
+		}
 		Thread.sleep(1000);
 
 		fail(solo.getCurrentActivity().getClass().getName());
