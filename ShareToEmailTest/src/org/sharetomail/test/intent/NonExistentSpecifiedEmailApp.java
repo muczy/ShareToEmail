@@ -1,5 +1,6 @@
 package org.sharetomail.test.intent;
 
+import org.sharetomail.AddModifyEmailAddressActivity;
 import org.sharetomail.MainActivity;
 import org.sharetomail.R;
 import org.sharetomail.test.Util;
@@ -86,11 +87,32 @@ public class NonExistentSpecifiedEmailApp extends
 		editor.commit();
 	}
 
-	public void testNonExistentSpecifiedEmailApp() throws InterruptedException {
+	private void clickOnEmailAddressAndWaitForErrorDialog() {
 		String emailAppNotFountText = solo.getCurrentActivity().getString(
 				R.string.email_app_not_found);
 		solo.clickOnView(Util.getEmailAddressesListView(solo).getChildAt(0));
 
 		assertTrue(solo.waitForText(emailAppNotFountText));
+	}
+
+	public void testNonExistentSpecifiedEmailApp_Modify()
+			throws InterruptedException {
+		clickOnEmailAddressAndWaitForErrorDialog();
+
+		solo.clickOnButton(solo.getCurrentActivity().getString(
+				R.string.modify_button));
+
+		assertTrue(solo.waitForActivity(AddModifyEmailAddressActivity.class,
+				5000));
+	}
+
+	public void testNonExistentSpecifiedEmailApp_Cancel()
+			throws InterruptedException {
+		clickOnEmailAddressAndWaitForErrorDialog();
+
+		solo.clickOnButton(solo.getCurrentActivity().getString(
+				android.R.string.cancel));
+
+		assertTrue(solo.waitForActivity(MainActivity.class, 5000));
 	}
 }
