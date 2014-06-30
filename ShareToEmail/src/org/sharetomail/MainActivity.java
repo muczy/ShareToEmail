@@ -20,7 +20,7 @@ import org.sharetomail.util.Constants;
 import org.sharetomail.util.DefaultItemHandlingAdapter;
 import org.sharetomail.util.EmailAddress;
 import org.sharetomail.util.Util;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -72,7 +72,6 @@ public class MainActivity extends Activity {
 
 		setContentView(R.layout.activity_main);
 
-		// TODO: remove this?
 		sharedPreferences = getSharedPreferences(
 				Constants.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
 		config = new Configuration(sharedPreferences);
@@ -355,6 +354,8 @@ public class MainActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 
+	// For AlertDialog the null root ViewGroup is not bad!
+	@SuppressLint("InflateParams")
 	private AlertDialog createAboutDialog() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		LayoutInflater inflater = getLayoutInflater();
