@@ -39,11 +39,6 @@ public class EmailAppChooserTest extends
 
 	@Override
 	protected void setUp() {
-		Intent intent = new Intent(Intent.ACTION_MAIN);
-		intent.putExtra(Intent.EXTRA_TEXT, TEST_LINK);
-		intent.putExtra(Intent.EXTRA_SUBJECT, TEST_SUBJECT);
-		setActivityIntent(intent);
-
 		sharedPreferences = getInstrumentation()
 				.getTargetContext()
 				.getApplicationContext()
@@ -73,6 +68,15 @@ public class EmailAppChooserTest extends
 		clearSharedPreferences();
 
 		super.tearDown();
+	}
+
+	@Override
+	public MainActivity getActivity() {
+		Intent intent = new Intent();
+		intent.putExtra(Intent.EXTRA_TEXT, TEST_LINK);
+		intent.putExtra(Intent.EXTRA_SUBJECT, TEST_SUBJECT);
+		setActivityIntent(intent);
+		return super.getActivity();
 	}
 
 	private void clearSharedPreferences() {
