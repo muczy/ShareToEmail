@@ -93,10 +93,22 @@ public class SpecifiedAppTest extends
 		editor.commit();
 	}
 
-	public void testUseEmailAppChooser() throws InterruptedException {
+	@Override
+	public MainActivity getActivity() {
+		Intent intent = new Intent();
+		intent.putExtra(Intent.EXTRA_TEXT, TEST_LINK);
+		intent.putExtra(Intent.EXTRA_SUBJECT, TEST_SUBJECT);
+		setActivityIntent(intent);
+		return super.getActivity();
+	}
+
+	public void testUseSpecifiedApp() throws InterruptedException {
 		String subjectPrefix = solo.getCurrentActivity().getString(
 				R.string.default_email_subject_prefix);
 		solo.clickOnView(Util.getEmailAddressesListView(solo).getChildAt(0));
+		Thread.sleep(1000);
+
+		fail(solo.getCurrentActivity().getClass().getName());
 
 		solo.waitForActivity(EMAIL_APP_NAME, 5000);
 		assertEquals(EMAIL_APP_NAME, solo.getCurrentActivity().getClass()
