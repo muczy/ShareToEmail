@@ -173,7 +173,16 @@ public class MainActivity extends Activity {
 		String textFromIntent = getIntent().getExtras()
 				.getCharSequence(Intent.EXTRA_TEXT).toString();
 
-		String subjectFromIntent = getSubject(textFromIntent);
+		String subjectFromIntent = getIntent().getStringExtra(
+				Intent.EXTRA_SUBJECT);
+
+		// Some apps (e.g. Feedly or Digg) don't set EXTRA_SUBJECT but the
+		// subject is included in the EXTRA_TEXT separated with a space from the
+		// URL like "text test http://url" or "text test\nhttp://url".
+		if (subjectFromIntent == null) {
+			subjectFromIntent = getSubject(textFromIntent);
+			textFromIntent = stripSubjectFromText(textFromIntent);
+		}
 
 		if (emailAddress.getEmailAppPackageName() != null
 				&& !emailAddress.getEmailAppPackageName().isEmpty()) {
@@ -259,12 +268,16 @@ public class MainActivity extends Activity {
 		finish();
 	}
 
+	private String stripSubjectFromText(String textFromIntent) {
+		String[] splittedText = textFromIntent.split("\\s");
+		String url = splittedText[splittedText.length - 1];
+		return textFromIntent.substring(textFromIntent.lastIndexOf(url));
+	}
+
 	private String getSubject(String textFromIntent) {
 		String subjectFromIntent = getIntent().getStringExtra(
 				Intent.EXTRA_SUBJECT);
-		// Some apps (e.g. Feedly or Digg) don't set EXTRA_SUBJECT but the
-		// subject is included in the EXTRA_TEXT separated with a space from the
-		// URL like "text test http://url" or "text test\nhttp://url".
+
 		if (subjectFromIntent == null) {
 			String[] splittedText = textFromIntent.split("\\s");
 			String url = splittedText[splittedText.length - 1];
@@ -277,6 +290,7 @@ public class MainActivity extends Activity {
 				subjectFromIntent = "";
 			}
 		}
+
 		return subjectFromIntent;
 	}
 
