@@ -16,7 +16,7 @@ import android.widget.ListView;
 
 import com.robotium.solo.Solo;
 
-public class CompatilbityTest extends
+public class CompatibilityTest extends
 		ActivityInstrumentationTestCase2<MainActivity> {
 
 	private SharedPreferences sharedPreferences;
@@ -25,7 +25,7 @@ public class CompatilbityTest extends
 	private String defaultEmail = "default.text@mail.org";
 	private String defaultEmailWOTLD = "default.text@mail";
 
-	public CompatilbityTest() {
+	public CompatibilityTest() {
 		super(MainActivity.class);
 	}
 

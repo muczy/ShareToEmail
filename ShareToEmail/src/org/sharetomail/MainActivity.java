@@ -20,7 +20,7 @@ import org.sharetomail.util.Constants;
 import org.sharetomail.util.DefaultItemHandlingAdapter;
 import org.sharetomail.util.EmailAddress;
 import org.sharetomail.util.Util;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -96,7 +96,6 @@ public class MainActivity extends Activity {
 				this, config.getEmailAddresses(),
 				config.getDefaultEmailAddress());
 		emailAddressesListView.setAdapter(emailAddressesAdapter);
-
 	}
 
 	@Override
@@ -171,9 +170,19 @@ public class MainActivity extends Activity {
 	}
 
 	private void sendEmail(EmailAddress emailAddress) {
-		String textFromIntent = getIntent().getStringExtra(Intent.EXTRA_TEXT);
+		String textFromIntent = getIntent().getExtras()
+				.getCharSequence(Intent.EXTRA_TEXT).toString();
 
-		String subjectFromIntent = getSubject(textFromIntent);
+		String subjectFromIntent = getIntent().getStringExtra(
+				Intent.EXTRA_SUBJECT);
+
+		// Some apps (e.g. Feedly or Digg) don't set EXTRA_SUBJECT but the
+		// subject is included in the EXTRA_TEXT separated with a space from the
+		// URL like "text test http://url" or "text test\nhttp://url".
+		if (subjectFromIntent == null) {
+			subjectFromIntent = getSubject(textFromIntent);
+			textFromIntent = stripSubjectFromText(textFromIntent);
+		}
 
 		if (emailAddress.getEmailAppPackageName() != null
 				&& !emailAddress.getEmailAppPackageName().isEmpty()) {
@@ -259,12 +268,16 @@ public class MainActivity extends Activity {
 		finish();
 	}
 
+	private String stripSubjectFromText(String textFromIntent) {
+		String[] splittedText = textFromIntent.split("\\s");
+		String url = splittedText[splittedText.length - 1];
+		return textFromIntent.substring(textFromIntent.lastIndexOf(url));
+	}
+
 	private String getSubject(String textFromIntent) {
 		String subjectFromIntent = getIntent().getStringExtra(
 				Intent.EXTRA_SUBJECT);
-		// Some apps (e.g. Feedly or Digg) don't set EXTRA_SUBJECT but the
-		// subject is included in the EXTRA_TEXT separated with a space from the
-		// URL like "text test http://url" or "text test\nhttp://url".
+
 		if (subjectFromIntent == null) {
 			String[] splittedText = textFromIntent.split("\\s");
 			String url = splittedText[splittedText.length - 1];
@@ -277,6 +290,7 @@ public class MainActivity extends Activity {
 				subjectFromIntent = "";
 			}
 		}
+
 		return subjectFromIntent;
 	}
 
@@ -355,6 +369,8 @@ public class MainActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 
+	// For AlertDialog the null root ViewGroup is not bad!
+	@SuppressLint("InflateParams")
 	private AlertDialog createAboutDialog() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		LayoutInflater inflater = getLayoutInflater();

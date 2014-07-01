@@ -1,10 +1,13 @@
 package org.sharetomail.test.testsuite;
 
-import org.sharetomail.test.CompatilbityTest;
-import org.sharetomail.test.MainActivityTest;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
+
+import org.sharetomail.test.CompatibilityTest;
+import org.sharetomail.test.MainActivityTest;
+import org.sharetomail.test.intent.EmailAppChooserTest;
+import org.sharetomail.test.intent.NonExistentSpecifiedEmailApp;
+import org.sharetomail.test.intent.dummyactivity.SpecifiedAppTest;
 
 public class StressTest {
 
@@ -15,7 +18,10 @@ public class StressTest {
 
 		for (int i = 0; i < RUNS; i++) {
 			suite.addTestSuite(MainActivityTest.class);
-			suite.addTestSuite(CompatilbityTest.class);
+			suite.addTestSuite(CompatibilityTest.class);
+			suite.addTestSuite(EmailAppChooserTest.class);
+			suite.addTestSuite(NonExistentSpecifiedEmailApp.class);
+			suite.addTestSuite(SpecifiedAppTest.class);
 		}
 
 		return suite;
