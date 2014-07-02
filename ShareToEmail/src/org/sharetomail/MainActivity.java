@@ -196,9 +196,8 @@ public class MainActivity extends Activity {
 
 	private void startEmailAppSelector(EmailAddress emailAddress,
 			String subject, String text) {
-		Intent sendMailIntent = new Intent(Intent.ACTION_SEND_MULTIPLE,
-				Uri.fromParts(Constants.MAILTO_SCHEME,
-						emailAddress.getEmailAddress(), null));
+		Intent sendMailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+				Constants.MAILTO_SCHEME, emailAddress.getEmailAddress(), null));
 
 		sendMailIntent.putExtra(Intent.EXTRA_SUBJECT,
 				config.getEmailSubjectPrefix() + subject);
