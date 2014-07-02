@@ -8,6 +8,8 @@
     <string name="send_email">Send email</string>
     <string name="email_app_not_found">The originally selected email application cannot be found. It might have been modified or uninstalled. Please verify email address settings! Do you want to modify it now?</string>
     <string name="modify_button">Modify</string>
+    <string name="delete_button">Delete</string>
+    <string name="delete_email_address_question">Are you sure you want to delete the %1$s email address?</string>
     <!-- Title strings -->
     <string name="app_name">Share to Email</string>
     <string name="title_activity_add_email_address">Add email address</string>

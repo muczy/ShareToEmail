@@ -327,6 +327,12 @@ public class MainActivityTest extends
 		solo.clickOnText(solo.getCurrentActivity().getString(
 				R.string.delete_email_address_menu_item));
 
+		assertTrue(solo.searchText(solo.getCurrentActivity().getString(
+				R.string.delete_email_address_question, defaultEmail)));
+
+		solo.clickOnButton(solo.getCurrentActivity().getString(
+				R.string.delete_button));
+
 		solo.assertCurrentActivity("Current activity is not "
 				+ MainActivity.class.getName(), MainActivity.class);
 
@@ -335,6 +341,27 @@ public class MainActivityTest extends
 		assertEquals(0, Util.getEmailAddressesListView(solo).getAdapter()
 				.getCount());
 		assertFalse(emailEmailAddressExistsInConfig(defaultEmail));
+	}
+
+	public void testDeleteEmail_Cancel() {
+		solo.clickLongOnView(Util.getEmailAddressesListView(solo).getChildAt(0));
+		solo.clickOnText(solo.getCurrentActivity().getString(
+				R.string.delete_email_address_menu_item));
+
+		assertTrue(solo.searchText(solo.getCurrentActivity().getString(
+				R.string.delete_email_address_question, defaultEmail)));
+
+		solo.clickOnButton(solo.getCurrentActivity().getString(
+				android.R.string.cancel));
+
+		solo.assertCurrentActivity("Current activity is not "
+				+ MainActivity.class.getName(), MainActivity.class);
+
+		solo.waitForView(Util.getEmailAddressesListView(solo));
+
+		assertEquals(1, Util.getEmailAddressesListView(solo).getAdapter()
+				.getCount());
+		assertTrue(emailEmailAddressExistsInConfig(defaultEmail));
 	}
 
 	public void testSetDefaultEmail() throws InterruptedException {
