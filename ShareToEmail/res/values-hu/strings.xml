@@ -8,6 +8,8 @@
     <string name="send_email">E-mail küldése</string>
     <string name="email_app_not_found">Az eredetileg kiválasztott e-mail program nem található. Talán megváltozott, vagy törlésre került. Kérem ellenőrizze az e-mail cím beállításait! Kívánja most módosítani őket?</string>
     <string name="modify_button">Módosítás</string>
+    <string name="delete_button">Törlés</string>
+    <string name="delete_email_address_question">Biztos, hogy törölni akarja a %1$s e-mail címet?</string>
     <!-- Title strings -->
     <string name="app_name">Share to Email</string>
     <string name="title_activity_add_email_address">E-mail cím hozzáadása</string>

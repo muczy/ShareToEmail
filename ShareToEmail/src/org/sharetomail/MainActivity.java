@@ -196,9 +196,8 @@ public class MainActivity extends Activity {
 
 	private void startEmailAppSelector(EmailAddress emailAddress,
 			String subject, String text) {
-		Intent sendMailIntent = new Intent(Intent.ACTION_SEND_MULTIPLE,
-				Uri.fromParts(Constants.MAILTO_SCHEME,
-						emailAddress.getEmailAddress(), null));
+		Intent sendMailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+				Constants.MAILTO_SCHEME, emailAddress.getEmailAddress(), null));
 
 		sendMailIntent.putExtra(Intent.EXTRA_SUBJECT,
 				config.getEmailSubjectPrefix() + subject);
@@ -339,18 +338,44 @@ public class MainActivity extends Activity {
 					Constants.MODIFY_EMAIL_ADDRESS_ACTIVITY_REQUEST_CODE);
 			return true;
 		case R.id.deleteEmailAddressItem:
-			config.removeEmailAddress(selectedItem);
+			askForDelete();
 
-			if (config.getDefaultEmailAddress().equals(selectedItem)) {
-				config.clearDefaultEmailAddress();
-			}
-
-			refreshEmailList();
 			return true;
 		default:
 			return super.onContextItemSelected(item);
 		}
 
+	}
+
+	private void askForDelete() {
+		Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(getString(R.string.delete_email_address_question,
+				selectedItem.getEmailAddress()));
+		builder.setPositiveButton(R.string.delete_button,
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						config.removeEmailAddress(selectedItem);
+
+						if (config.getDefaultEmailAddress()
+								.equals(selectedItem)) {
+							config.clearDefaultEmailAddress();
+						}
+
+						refreshEmailList();
+					}
+				});
+		builder.setNegativeButton(android.R.string.cancel,
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						return;
+					}
+				});
+		AlertDialog dialog = builder.create();
+		dialog.show();
 	}
 
 	@Override
