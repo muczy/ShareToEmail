@@ -8,6 +8,8 @@ import org.sharetomail.test.MainActivityTest;
 import org.sharetomail.test.intent.EmailAppChooserTest;
 import org.sharetomail.test.intent.NonExistentSpecifiedEmailApp;
 import org.sharetomail.test.intent.dummyactivity.SpecifiedAppTest;
+import org.sharetomail.test.intent.dummyactivity.SpecifiedAppTestWithNewlineSubject;
+import org.sharetomail.test.intent.dummyactivity.SpecifiedAppTestWithSpaceSubject;
 
 public class StressTest {
 
@@ -22,6 +24,8 @@ public class StressTest {
 			suite.addTestSuite(EmailAppChooserTest.class);
 			suite.addTestSuite(NonExistentSpecifiedEmailApp.class);
 			suite.addTestSuite(SpecifiedAppTest.class);
+			suite.addTestSuite(SpecifiedAppTestWithNewlineSubject.class);
+			suite.addTestSuite(SpecifiedAppTestWithSpaceSubject.class);
 		}
 
 		return suite;
