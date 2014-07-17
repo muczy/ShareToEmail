@@ -121,9 +121,12 @@ public class MainActivityTest extends
 		return getEmailAddressFromConfig(emailAddress) != null;
 	}
 
+	private void clickOnAddNewEmailMenu() {
+		solo.clickOnView(solo.getView(R.id.action_add_email_address));
+	}
+
 	public void testOpenNewEmail() {
-		solo.clickOnText(solo.getCurrentActivity().getString(
-				R.string.add_email_address_button));
+		clickOnAddNewEmailMenu();
 
 		solo.assertCurrentActivity("Current activity is not "
 				+ AddModifyEmailAddressActivity.class.getName(),
@@ -131,8 +134,7 @@ public class MainActivityTest extends
 	}
 
 	public void testAddNewEmail_ValidEmail() {
-		solo.clickOnButton(solo.getCurrentActivity().getString(
-				R.string.add_email_address_button));
+		clickOnAddNewEmailMenu();
 
 		solo.waitForActivity(AddModifyEmailAddressActivity.class, 10000);
 
@@ -156,8 +158,7 @@ public class MainActivityTest extends
 	}
 
 	public void testAddNewEmail_ValidEmailWithoutTLD() {
-		solo.clickOnButton(solo.getCurrentActivity().getString(
-				R.string.add_email_address_button));
+		clickOnAddNewEmailMenu();
 
 		solo.waitForActivity(AddModifyEmailAddressActivity.class, 10000);
 
@@ -181,8 +182,7 @@ public class MainActivityTest extends
 	}
 
 	public void testAddNewEmail_InvalidEmail() {
-		solo.clickOnButton(solo.getCurrentActivity().getString(
-				R.string.add_email_address_button));
+		clickOnAddNewEmailMenu();
 
 		solo.waitForActivity(AddModifyEmailAddressActivity.class, 10000);
 
@@ -218,8 +218,7 @@ public class MainActivityTest extends
 	private void specificEmailAppTest(int appSelectorPosition)
 			throws InterruptedException {
 		// Add test email address.
-		solo.clickOnButton(solo.getCurrentActivity().getString(
-				R.string.add_email_address_button));
+		clickOnAddNewEmailMenu();
 
 		solo.waitForActivity(AddModifyEmailAddressActivity.class, 10000);
 

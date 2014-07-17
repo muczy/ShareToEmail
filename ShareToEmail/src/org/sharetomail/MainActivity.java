@@ -20,6 +20,7 @@ import org.sharetomail.util.Constants;
 import org.sharetomail.util.DefaultItemHandlingAdapter;
 import org.sharetomail.util.EmailAddress;
 import org.sharetomail.util.Util;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -42,11 +43,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -127,7 +126,6 @@ public class MainActivity extends Activity {
 	}
 
 	private void initWidgets() {
-		Button addEmailAddressButton = (Button) findViewById(R.id.addEmailAddressButton);
 		emailAddressesListView = (ListView) findViewById(R.id.emailAddressesListView);
 
 		// If the app has been started from a launcher (and not a share intent)
@@ -155,18 +153,6 @@ public class MainActivity extends Activity {
 						return false;
 					}
 				});
-
-		addEmailAddressButton.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				Intent addEmailAddressIntent = new Intent(
-						getApplicationContext(),
-						AddModifyEmailAddressActivity.class);
-				startActivityForResult(addEmailAddressIntent,
-						Constants.ADD_EMAIL_ADDRESS_ACTIVITY_REQUEST_CODE);
-			}
-		});
 	}
 
 	private void sendEmail(EmailAddress emailAddress) {
@@ -381,6 +367,12 @@ public class MainActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+		case R.id.action_add_email_address:
+			Intent addEmailAddressIntent = new Intent(getApplicationContext(),
+					AddModifyEmailAddressActivity.class);
+			startActivityForResult(addEmailAddressIntent,
+					Constants.ADD_EMAIL_ADDRESS_ACTIVITY_REQUEST_CODE);
+			return true;
 		case R.id.action_settings:
 			Intent settingsIntent = new Intent(this, SettingsActivity.class);
 			startActivityForResult(settingsIntent,
